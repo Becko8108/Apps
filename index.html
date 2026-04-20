@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="theme-color" content="#1D9E75"/>
+<title>Bert — Gezondheid</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{
+  --bg:#F4F3EF;--surface:#fff;--surface2:#EEECEA;--border:#E2E0DA;
+  --text:#18180F;--muted:#6A6960;--hint:#ABA9A2;
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-dk:#0F6E56;--green-txt:#085041;
+  --blue:#185FA5;--blue-bg:#E6F1FB;--blue-dk:#0C447C;
+  --amber:#854F0B;--amber-bg:#FAEEDA;
+  --red:#A32D2D;--red-bg:#FCEBEB;
+  --purple:#534AB7;--purple-bg:#EEEDFE;
+  --r:12px;--rs:8px;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:15px}
+.app{max-width:480px;margin:0 auto;padding-bottom:84px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:13px 16px 9px;position:sticky;top:0;z-index:50}
+.tb-row{display:flex;align-items:center;justify-content:space-between}
+.tb-title{font-size:17px;font-weight:500}
+.tb-badge{font-size:10px;background:var(--amber-bg);color:var(--amber);padding:3px 8px;border-radius:99px;font-weight:500}
+.tb-date{font-size:11px;color:var(--muted);margin-top:3px;font-family:var(--mono)}
+.bnav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom,0)}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px 7px;cursor:pointer;border:none;background:none;color:var(--hint);font-family:var(--font);transition:color .15s}
+.nb.on{color:var(--green)}
+.ni{font-size:19px;line-height:1.2}
+.nl{font-size:10px;margin-top:2px;font-weight:500}
+.sec{display:none;padding:14px}
+.sec.on{display:block}
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--border);padding:14px;margin-bottom:11px}
+.ct{font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px}
+.mg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.mc{background:var(--surface2);border-radius:var(--rs);padding:11px 12px}
+.ml{font-size:11px;color:var(--muted);margin-bottom:3px}
+.mv{font-size:20px;font-weight:500}
+.ms{font-size:11px;color:var(--hint);margin-top:2px}
+.mv.g{color:var(--green-dk)}.mv.b{color:var(--blue)}.mv.a{color:var(--amber)}
+.pbr{display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.pbr:last-child{margin-bottom:0}
+.pbi{flex:1;min-width:0}
+.pbl{font-size:13px;font-weight:500}
+.pbs{font-size:11px;color:var(--muted);margin-top:1px}
+.pbw{width:90px;height:7px;background:var(--surface2);border-radius:99px;overflow:hidden;flex-shrink:0}
+.pbf{height:100%;border-radius:99px;transition:width .5s}
+.pbp{font-size:12px;font-weight:500;min-width:30px;text-align:right;color:var(--muted)}
+.cr{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);cursor:pointer;user-select:none}
+.cr:last-child{border-bottom:none;padding-bottom:0}
+.cr:first-child{padding-top:0}
+.cb{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.cb.on{background:var(--green);border-color:var(--green-dk)}
+.cb svg{display:none}.cb.on svg{display:block}
+.cl{font-size:14px}.cl.done{color:var(--hint);text-decoration:line-through}
+.badge{display:inline-block;font-size:10px;padding:2px 6px;border-radius:99px;font-weight:500;margin-left:4px}
+.ba{background:var(--amber-bg);color:var(--amber)}
+.bb{background:var(--blue-bg);color:var(--blue-dk)}
+.bg{background:var(--green-bg);color:var(--green-txt)}
+.av{border-radius:0 var(--rs) var(--rs) 0;padding:9px 11px;margin-bottom:8px;border-left:3px solid transparent}
+.av:last-child{margin-bottom:0}
+.av.g{background:var(--green-bg);border-color:var(--green)}
+.av.a{background:var(--amber-bg);border-color:#EF9F27}
+.av.r{background:var(--red-bg);border-color:#E24B4A}
+.avt{font-size:13px;font-weight:500}
+.av.g .avt{color:var(--green-dk)}.av.a .avt{color:var(--amber)}.av.r .avt{color:var(--red)}
+.avb{font-size:12px;margin-top:3px;line-height:1.5}
+.av.g .avb{color:var(--green-txt)}.av.a .avb{color:var(--amber)}.av.r .avb{color:var(--red)}
+input,textarea{font-family:var(--font);font-size:14px;padding:9px 11px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface2);color:var(--text);width:100%;outline:none;transition:border .15s}
+input:focus,textarea:focus{border-color:var(--green)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+.irow{display:flex;gap:8px;margin-top:9px;align-items:center}
+.irow input{flex:1}
+button{font-family:var(--font);font-size:13px;font-weight:500;padding:8px 14px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;transition:all .15s;white-space:nowrap}
+button:active{transform:scale(.97)}
+button.p{background:var(--green);color:#fff;border-color:var(--green-dk)}
+.wg{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:6px}
+.wd-name{font-size:9px;color:var(--muted);margin-bottom:3px;font-weight:500;text-align:center}
+.wc{border-radius:6px;padding:5px 2px;min-height:68px;display:flex;flex-direction:column;gap:2px;align-items:center;background:var(--surface2);border:1px solid var(--border)}
+.pill{font-size:9px;padding:2px 4px;border-radius:99px;white-space:nowrap;font-weight:500}
+.pg{background:var(--green-bg);color:var(--green-txt)}
+.pb{background:var(--blue-bg);color:var(--blue-dk)}
+.pt{background:#E1F5EE;color:#085041}
+.pp{background:var(--purple-bg);color:var(--purple)}
+.wn{font-size:8px;color:var(--muted);margin-top:2px;text-align:center;padding:0 2px;line-height:1.3}
+.hrow{margin-bottom:10px}
+.hrow:last-child{margin-bottom:0}
+.hl{font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:500}
+.hdays{display:flex;gap:4px}
+.hd{flex:1;aspect-ratio:1;border-radius:5px;border:1px solid var(--border);background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--hint);cursor:pointer;transition:all .15s;font-weight:500}
+.hd.on{background:var(--green);border-color:var(--green-dk);color:#fff}
+.hd.td{border-color:var(--blue);box-shadow:0 0 0 1.5px var(--blue)}
+.mr{display:flex;gap:7px;flex-wrap:wrap;margin-top:6px}
+.mb{padding:7px 13px;border-radius:99px;border:1px solid var(--border);font-size:13px;cursor:pointer;background:var(--surface2);color:var(--muted);transition:all .15s;font-family:var(--font)}
+.mb.on{background:var(--blue-bg);border-color:var(--blue);color:var(--blue-dk);font-weight:500}
+.er{display:flex;gap:6px;margin-top:6px}
+.eb{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);font-size:13px;font-weight:500;cursor:pointer;background:var(--surface2);color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .15s;font-family:var(--font)}
+.eb.on{background:var(--green);border-color:var(--green-dk);color:#fff}
+.li{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--border)}
+.li:last-child{border-bottom:none}
+.ld{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0;margin-top:5px}
+.lt{font-size:13px;flex:1;line-height:1.4}
+.ltime{font-size:10px;color:var(--hint);font-family:var(--mono);white-space:nowrap}
+.mlbl{font-size:11px;color:var(--muted);margin-bottom:5px;margin-top:12px;font-weight:500}
+.mlbl:first-child{margin-top:0}
+.cw{position:relative;width:100%;height:200px;margin-top:10px}
+.tl{position:relative;padding-left:20px}
+.tl::before{content:'';position:absolute;left:7px;top:6px;bottom:6px;width:1px;background:var(--border)}
+.ti{position:relative;margin-bottom:16px}
+.ti:last-child{margin-bottom:0}
+.td{position:absolute;left:-16px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg)}
+.tt{font-size:14px;font-weight:500;margin-bottom:2px}
+.tb2{font-size:12px;color:var(--muted);line-height:1.5}
+.bvg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.bvg label{font-size:11px;color:var(--muted);display:block;margin-bottom:4px}
+.bvg .bvh{font-size:10px;color:var(--hint);margin-top:3px}
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%);background:var(--green-dk);color:#fff;padding:9px 18px;border-radius:99px;font-size:13px;font-weight:500;z-index:200;opacity:0;transition:opacity .2s;pointer-events:none;white-space:nowrap}
+.toast.on{opacity:1}
+input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none}
+::-webkit-scrollbar{width:0}
+</style>
+</head>
+<body>
+<div class="app">
+
+<div class="topbar">
+  <div class="tb-row">
+    <div class="tb-title">Bert — Gezondheid</div>
+    <div class="tb-badge">Fase 1 — Stabilisatie</div>
+  </div>
+  <div class="tb-date" id="live-date"></div>
+</div>
+
+<!-- VANDAAG -->
+<div class="sec on" id="s-today">
+  <div class="mg">
+    <div class="mc"><div class="ml">Gewicht nu</div><div class="mv" id="h-wt">110 kg</div><div class="ms">Doel: 85 kg</div></div>
+    <div class="mc"><div class="ml">Al verloren</div><div class="mv g" id="h-lost">0 kg</div><div class="ms">van 25 kg totaal</div></div>
+    <div class="mc"><div class="ml">Nuchter</div><div class="mv g" id="h-sob">dag 1</div><div class="ms">alcohol/coke/roken</div></div>
+    <div class="mc"><div class="ml">CPAP</div><div class="mv b" id="h-cpap">dag 1</div><div class="ms">doel: 42 nachten</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Vandaag checklist</div>
+    <div id="cl-cont"></div>
+    <div class="irow">
+      <input type="text" id="new-task" placeholder="Extra taak toevoegen..."/>
+      <button onclick="addTask()">+ Voeg toe</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Hoe voel ik me?</div>
+    <div class="mlbl">Stemming</div>
+    <div class="mr">
+      <div class="mb" onclick="selM(this)">Super</div>
+      <div class="mb" onclick="selM(this)">Goed</div>
+      <div class="mb" onclick="selM(this)">Ok</div>
+      <div class="mb" onclick="selM(this)">Moe</div>
+      <div class="mb" onclick="selM(this)">Zwaar</div>
+    </div>
+    <div class="mlbl">Energie (1–5)</div>
+    <div class="er">
+      <div class="eb" onclick="selE(this,1)">1</div>
+      <div class="eb" onclick="selE(this,2)">2</div>
+      <div class="eb" onclick="selE(this,3)">3</div>
+      <div class="eb" onclick="selE(this,4)">4</div>
+      <div class="eb" onclick="selE(this,5)">5</div>
+    </div>
+    <div class="mlbl">Dagboek</div>
+    <textarea id="journal" placeholder="Hoe was je dag? Cravings? Slaap? Energie?"></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px">
+      <button class="p" onclick="saveToday()">Opslaan</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Logboek vandaag</div>
+    <div id="log-list"><div style="font-size:13px;color:var(--hint);padding:4px 0">Nog geen logs vandaag.</div></div>
+    <div class="irow">
+      <input type="text" id="log-in" placeholder="Log een prestatie of notitie..."/>
+      <button onclick="addLog()">Log</button>
+    </div>
+  </div>
+</div>
+
+<!-- GEWICHT -->
+<div class="sec" id="s-weight">
+  <div class="card">
+    <div class="ct">Nieuwe weging</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+      <input type="number" id="wt-in" step="0.1" min="70" max="130" placeholder="bijv. 109.5" style="width:130px"/>
+      <span style="font-size:14px;color:var(--muted)">kg</span>
+      <button class="p" onclick="logWeight()">Bewaar</button>
+    </div>
+    <div class="mg" style="margin-bottom:0">
+      <div class="mc"><div class="ml">Start</div><div class="mv">110 kg</div><div class="ms">April 2026</div></div>
+      <div class="mc"><div class="ml">Nu</div><div class="mv g" id="w-now">110 kg</div><div class="ms" id="w-diff">0 kg verloren</div></div>
+      <div class="mc"><div class="ml">Doel</div><div class="mv">85 kg</div><div class="ms">18–24 maanden</div></div>
+      <div class="mc"><div class="ml">BMI nu</div><div class="mv a" id="w-bmi">32.2</div><div class="ms">Doel: 24.9</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">Gewichtsverloop</div>
+    <div class="cw"><canvas id="wChart" role="img" aria-label="Gewichtsverloop">Grafiek gewicht over tijd.</canvas></div>
+    <div id="w-hist" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Doelen per fase</div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Fase 1 — maand 1–2 <span class="badge ba">nu</span></div><div class="pbs">Doel: –4 kg → 106 kg</div></div><div class="pbw"><div class="pbf" id="pf1" style="width:0%;background:#EF9F27"></div></div><div class="pbp" id="pp1">0%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Fase 2 — maand 3–6</div><div class="pbs">Doel: –12 kg → 98 kg</div></div><div class="pbw"><div class="pbf" id="pf2" style="width:0%;background:#378ADD"></div></div><div class="pbp" id="pp2">0%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Fase 3 — maand 7–12</div><div class="pbs">Doel: –22 kg → 88 kg</div></div><div class="pbw"><div class="pbf" id="pf3" style="width:0%;background:#1D9E75"></div></div><div class="pbp" id="pp3">0%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Einddoel — maand 24</div><div class="pbs">Doel: –25 kg → 85 kg</div></div><div class="pbw"><div class="pbf" id="pfin" style="width:0%;background:#639922"></div></div><div class="pbp" id="ppin">0%</div></div>
+  </div>
+</div>
+
+<!-- SPORT -->
+<div class="sec" id="s-sport">
+  <div class="card">
+    <div class="ct">Weekschema — Fase 1</div>
+    <div class="wg">
+      <div><div class="wd-name">Ma</div><div class="wc"><span class="pill pb">E-bike</span><span class="wn">32km heen</span></div></div>
+      <div><div class="wd-name">Di</div><div class="wc"><span class="pill pb">E-bike</span><span class="wn">32km terug</span></div></div>
+      <div><div class="wd-name">Wo</div><div class="wc"><span class="pill" style="background:var(--surface2);color:var(--hint)">Rust</span><span class="wn">stappen</span></div></div>
+      <div><div class="wd-name">Do</div><div class="wc"><span class="pill pb">E-bike</span><span class="wn">32km heen</span></div></div>
+      <div><div class="wd-name">Vr</div><div class="wc"><span class="pill pb">E-bike</span><span class="wn">32km terug</span></div></div>
+      <div><div class="wd-name">Za</div><div class="wc"><span class="pill pp">Kracht</span><span class="wn">30 min</span><span class="pill pg" style="margin-top:2px">Fiets</span><span class="wn">rustig</span></div></div>
+      <div><div class="wd-name">Zo</div><div class="wc"><span class="pill pt">Zwemmen</span><span class="wn">20–30 min</span></div></div>
+    </div>
+    <div style="font-size:11px;color:var(--hint);margin-top:8px">Woensdag = rust (werk). Koersfiets 2×/week pas in fase 2 (maand 3+).</div>
+  </div>
+  <div class="card">
+    <div class="ct">Sporthabits — deze week</div>
+    <div id="habit-cont"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Prestatiedoelen</div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Koersfiets 120 km @ 30 km/u</div><div class="pbs">Verwacht: maand 18–24</div></div><div class="pbw"><div class="pbf" style="width:3%;background:#378ADD"></div></div><div class="pbp">3%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Zwemmen 40×25m schoolslag</div><div class="pbs">Verwacht: maand 12</div></div><div class="pbw"><div class="pbf" style="width:3%;background:#1D9E75"></div></div><div class="pbp">3%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Kracht 3×/week</div><div class="pbs">Nu: 1× → doel maand 7</div></div><div class="pbw"><div class="pbf" style="width:15%;background:#7F77DD"></div></div><div class="pbp">15%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">10.000 stappen/dag</div><div class="pbs">E-bike telt mee</div></div><div class="pbw"><div class="pbf" style="width:60%;background:#639922"></div></div><div class="pbp">60%</div></div>
+  </div>
+</div>
+
+<!-- MEDISCH -->
+<div class="sec" id="s-medical">
+  <div class="mg">
+    <div class="mc"><div class="ml">HIV</div><div class="mv g" style="font-size:14px;margin-top:3px">Dovato</div><div class="ms">Nooit onderbreken</div></div>
+    <div class="mc"><div class="ml">Diabetes T2</div><div class="mv a" style="font-size:14px;margin-top:3px">Metformax</div><div class="ms">+ Toujeo insuline</div></div>
+    <div class="mc"><div class="ml">Bloeddruk</div><div class="mv a" style="font-size:14px;margin-top:3px">Coversyl</div><div class="ms">Bij sport monitoren</div></div>
+    <div class="mc"><div class="ml">Slaapapneu</div><div class="mv g" style="font-size:14px;margin-top:3px">CPAP</div><div class="ms">Gestart — volhouden!</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Medicatie vandaag</div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">Dovato (HIV)</span></div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">Metformax (diabetes)</span></div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">Toujeo (insuline)</span></div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">Coversyl (bloeddruk)</span></div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">ADHD medicatie</span></div>
+    <div class="cr" onclick="tCR(this)"><div class="cb"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl">CPAP gebruikt vannacht</span></div>
+  </div>
+  <div class="card">
+    <div class="ct">Bloedwaarden loggen</div>
+    <div class="bvg">
+      <div><label>Bloedsuiker nuchter</label><input type="number" id="bv-s" step="0.1" placeholder="mmol/L"/><div class="bvh">Doel: 4.0–7.0 mmol/L</div></div>
+      <div><label>Bloeddruk</label><input type="text" id="bv-b" placeholder="135/85"/><div class="bvh">Doel: &lt;130/80</div></div>
+      <div><label>Hartslag rust</label><input type="number" id="bv-h" placeholder="bpm"/><div class="bvh">Doel: &lt;65 bpm</div></div>
+      <div><label>Gewicht</label><input type="number" id="bv-w" step="0.1" placeholder="kg"/><div class="bvh">Optioneel</div></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="p" onclick="saveBV()">Bewaar waarden</button></div>
+    <div id="bv-hist" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Aandachtspunten</div>
+    <div class="av r"><div class="avt">Alcohol · coke · nicotine — definitief gestopt</div><div class="avb">Combinatie met HIV-medicatie en diabetes is op lange termijn levensgevaarlijk. Elke nuchter dag telt.</div></div>
+    <div class="av a"><div class="avt">Hartslag bij sport monitoren</div><div class="avb">ADHD-medicatie verhoogt hartslag. Bij &gt;160 bpm: tempo verlagen. Bloeddruk na inspanning checken.</div></div>
+    <div class="av g"><div class="avt">CPAP: 6 weken geduld</div><div class="avb">Het echte effect op energie, bloedsuiker en bloeddruk merk je pas na 4–6 weken consistent gebruik.</div></div>
+  </div>
+</div>
+
+<!-- DOELEN -->
+<div class="sec" id="s-goals">
+  <div class="card">
+    <div class="ct">Startdatum instellen</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:8px">Wanneer ben je gestart met je nieuwe levensstijl?</div>
+    <input type="date" id="start-dt" style="width:auto"/>
+    <div style="display:flex;justify-content:flex-end;margin-top:8px"><button class="p" onclick="saveStart()">Bewaar datum</button></div>
+    <div id="start-info" style="margin-top:10px;font-size:13px;color:var(--green-dk);font-weight:500"></div>
+  </div>
+  <div class="card">
+    <div class="ct">Grote doelen</div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Gewicht 85 kg <span class="badge ba">in progress</span></div><div class="pbs">110 → 85 kg · 18–24 maanden</div></div><div class="pbw"><div class="pbf" id="gw" style="width:0%;background:#EF9F27"></div></div><div class="pbp" id="gpw">0%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Nuchter blijven <span class="badge bg">actief</span></div><div class="pbs">Alcohol · coke · nicotine · doel: 1 jaar</div></div><div class="pbw"><div class="pbf" id="gsob" style="width:1%;background:#1D9E75"></div></div><div class="pbp" id="gpsob">1%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">CPAP elke nacht</div><div class="pbs">Milestone: 42 nachten op rij</div></div><div class="pbw"><div class="pbf" id="gcpap" style="width:2%;background:#378ADD"></div></div><div class="pbp" id="gpcpap">2%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Diabetes in remissie</div><div class="pbs">Na –15 kg · verwacht maand 12–18</div></div><div class="pbw"><div class="pbf" style="width:3%;background:#1D9E75"></div></div><div class="pbp">3%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">Bloeddruk normaal</div><div class="pbs">Na –15 kg + CPAP · maand 12</div></div><div class="pbw"><div class="pbf" style="width:3%;background:#1D9E75"></div></div><div class="pbp">3%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">120 km koersrit @ 30 km/u</div><div class="pbs">Verwacht: maand 18–24</div></div><div class="pbw"><div class="pbf" style="width:2%;background:#378ADD"></div></div><div class="pbp">2%</div></div>
+    <div class="pbr"><div class="pbi"><div class="pbl">40×25m schoolslag</div><div class="pbs">Verwacht: maand 12</div></div><div class="pbw"><div class="pbf" style="width:2%;background:#1D9E75"></div></div><div class="pbp">2%</div></div>
+  </div>
+  <div class="card">
+    <div class="ct">Tijdlijn</div>
+    <div class="tl">
+      <div class="ti"><div class="td" style="background:#EF9F27"></div><div class="tt">Nu — Maand 2 <span class="badge ba">huidige fase</span></div><div class="tb2">CPAP wennen · verslavingen loslaten · voeding stabiliseren · doel –4 kg</div></div>
+      <div class="ti"><div class="td" style="background:#378ADD"></div><div class="tt">Maand 3–6</div><div class="tb2">Sport opbouwen · koersfiets 1×/week · kracht 2×/week · zwemmen zondag · –12 kg</div></div>
+      <div class="ti"><div class="td" style="background:#1D9E75"></div><div class="tt">Maand 7–12</div><div class="tb2">Opschaling · kracht 3×/week · koersfiets 60–80 km · diabetes check · –22 kg</div></div>
+      <div class="ti"><div class="td" style="background:#639922"></div><div class="tt">Maand 13–24</div><div class="tb2">120 km koersrit · 40×25m schoolslag · 85 kg · diabetes/bloeddruk genormaliseerd</div></div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bnav">
+  <button class="nb on" onclick="showSec('today',this)"><span class="ni">☀️</span><span class="nl">Vandaag</span></button>
+  <button class="nb" onclick="showSec('weight',this)"><span class="ni">⚖️</span><span class="nl">Gewicht</span></button>
+  <button class="nb" onclick="showSec('sport',this)"><span class="ni">🚴</span><span class="nl">Sport</span></button>
+  <button class="nb" onclick="showSec('medical',this)"><span class="ni">💊</span><span class="nl">Medisch</span></button>
+  <button class="nb" onclick="showSec('goals',this)"><span class="ni">🎯</span><span class="nl">Doelen</span></button>
+</div>
+
+<div class="toast" id="toast">Opgeslagen!</div>
+
+<script>
+const HABITS = ['E-bike naar werk','Zwemmen (zondag)','Kracht (zaterdag)','10.000 stappen','Geen verslaving','CPAP gebruikt'];
+const DAYS = ['Ma','Di','Wo','Do','Vr','Za','Zo'];
+const todayDow = new Date().getDay();
+const todayIdx = todayDow === 0 ? 6 : todayDow - 1;
+
+function ld(k, d) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch { return d; } }
+function sv(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function fmtDate(d) { return d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear(); }
+function todayKey() { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth()+1) + '-' + d.getDate(); }
+function weekKey() { const d = new Date(); const j = new Date(d.getFullYear(),0,1); return d.getFullYear() + '-W' + Math.ceil(((d-j)/86400000+j.getDay()+1)/7); }
+
+let ST = {
+  weights: ld('bk_wts', [{date:fmtDate(new Date()),val:110}]),
+  logs: ld('bk_logs_'+todayKey(), []),
+  checklist: ld('bk_cl', [
+    {l:'Medicatie genomen',d:false},{l:'CPAP klaarleggen',d:false},
+    {l:'Ontbijt met eiwitten',d:false},{l:'10.000 stappen',d:false},
+    {l:'Geen alcohol / coke / roken',d:false},{l:'2 liter water gedronken',d:false}
+  ]),
+  habits: ld('bk_hab_'+weekKey(), {}),
+  mood: ld('bk_mood_'+todayKey(), ''),
+  energy: ld('bk_nrg_'+todayKey(), 0),
+  journal: ld('bk_jrn_'+todayKey(), ''),
+  startDate: ld('bk_sd', ''),
+  bvHist: ld('bk_bv', []),
+};
+
+// INIT
+document.getElementById('live-date').textContent = new Date().toLocaleDateString('nl-BE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+if (ST.journal) document.getElementById('journal').value = ST.journal;
+renderCL(); renderLogs(); renderHabits(); renderBVHist(); renderStartInfo();
+updateHeaderMetrics();
+if (ST.mood) document.querySelectorAll('.mb').forEach(b => { if(b.textContent===ST.mood) b.classList.add('on'); });
+if (ST.energy) document.querySelectorAll('.eb').forEach(b => { if(parseInt(b.textContent)===ST.energy) b.classList.add('on'); });
+
+// NAV
+function showSec(id, btn) {
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(b => b.classList.remove('on'));
+  document.getElementById('s-'+id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo(0,0);
+  if (id==='weight') { if (!wChart) initWChart(); else { updateWDisp(ST.weights[ST.weights.length-1].val); renderWHist(); } }
+  if (id==='sport') renderHabits();
+}
+
+// TOAST
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg||'Opgeslagen!';
+  t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),2000);
+}
+
+// CHECKLIST
+function renderCL() {
+  const c = document.getElementById('cl-cont');
+  c.innerHTML = '';
+  ST.checklist.forEach((item,i) => {
+    const r = document.createElement('div');
+    r.className = 'cr';
+    r.onclick = () => { item.d=!item.d; sv('bk_cl',ST.checklist); renderCL(); };
+    r.innerHTML = `<div class="cb${item.d?' on':''}"><svg width="10" height="8" viewBox="0 0 10 8"><polyline points="1,4 3.5,6.5 9,1" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div><span class="cl${item.d?' done':''}">${item.l}</span>`;
+    c.appendChild(r);
+  });
+}
+function addTask() {
+  const inp = document.getElementById('new-task');
+  if (!inp.value.trim()) return;
+  ST.checklist.push({l:inp.value.trim(),d:false});
+  inp.value='';
+  sv('bk_cl',ST.checklist);
+  renderCL();
+}
+function tCR(row) {
+  row.querySelector('.cb').classList.toggle('on');
+  const cl = row.querySelector('.cl');
+  cl.classList.toggle('done');
+}
+
+// LOGS
+function renderLogs() {
+  const el = document.getElementById('log-list');
+  if (!ST.logs.length) { el.innerHTML='<div style="font-size:13px;color:var(--hint);padding:4px 0">Nog geen logs vandaag.</div>'; return; }
+  el.innerHTML = ST.logs.map(l=>`<div class="li"><div class="ld"></div><div class="lt">${l.t}</div><div class="ltime">${l.ts}</div></div>`).join('');
+}
+function addLog() {
+  const inp = document.getElementById('log-in');
+  if (!inp.value.trim()) return;
+  const now = new Date();
+  ST.logs.unshift({t:inp.value.trim(),ts:now.toLocaleTimeString('nl-BE',{hour:'2-digit',minute:'2-digit'})});
+  inp.value='';
+  sv('bk_logs_'+todayKey(),ST.logs);
+  renderLogs();
+}
+
+// MOOD / ENERGY
+function selM(btn) { document.querySelectorAll('.mb').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); ST.mood=btn.textContent; }
+function selE(btn,v) { document.querySelectorAll('.eb').forEach(b=>b.classList.remove('on')); btn.classList.add('on'); ST.energy=v; }
+
+// SAVE TODAY
+function saveToday() {
+  ST.journal = document.getElementById('journal').value;
+  sv('bk_jrn_'+todayKey(),ST.journal);
+  sv('bk_mood_'+todayKey(),ST.mood);
+  sv('bk_nrg_'+todayKey(),ST.energy);
+  toast('Dag opgeslagen!');
+}
+
+// WEIGHT CHART
+let wChart;
+function initWChart() {
+  const ctx = document.getElementById('wChart');
+  const labs = ST.weights.map(w=>w.date);
+  const data = ST.weights.map(w=>w.val);
+  wChart = new Chart(ctx, {
+    type:'line',
+    data:{labels:labs,datasets:[
+      {label:'Gewicht',data,borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',tension:.3,pointBackgroundColor:'#378ADD',pointRadius:5,pointHoverRadius:7},
+      {label:'Doel',data:labs.map(()=>85),borderColor:'#1D9E75',borderDash:[5,4],pointRadius:0,tension:0}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{y:{min:80,max:115,ticks:{stepSize:5,callback:v=>v+' kg',font:{size:11}},grid:{color:'rgba(0,0,0,.05)'}},x:{ticks:{font:{size:10},maxRotation:35}}},
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.datasetIndex===0?c.raw+' kg':'Doel: 85 kg'}}}}
+  });
+  updateWDisp(ST.weights[ST.weights.length-1].val);
+  renderWHist();
+}
+function logWeight() {
+  const inp = document.getElementById('wt-in');
+  const val = parseFloat(inp.value);
+  if (!val||val<70||val>130) { toast('Ongeldig gewicht'); return; }
+  const e = {date:fmtDate(new Date()),val};
+  ST.weights.push(e);
+  sv('bk_wts',ST.weights);
+  inp.value='';
+  updateWDisp(val);
+  if (wChart) {
+    wChart.data.labels.push(e.date);
+    wChart.data.datasets[0].data.push(val);
+    wChart.data.datasets[1].data.push(85);
+    wChart.update();
+  } else {
+    initWChart();
+  }
+  renderWHist();
+  updateHeaderMetrics();
+  toast('Weging opgeslagen!');
+}
+function updateWDisp(cur) {
+  const lost = Math.max(0,110-cur);
+  document.getElementById('w-now').textContent = cur.toFixed(1)+' kg';
+  document.getElementById('w-diff').textContent = lost.toFixed(1)+' kg verloren';
+  document.getElementById('w-bmi').textContent = (cur/3.4225).toFixed(1);
+  [['pf1','pp1',4],['pf2','pp2',12],['pf3','pp3',22],['pfin','ppin',25]].forEach(([f,p,t])=>{
+    const pct=Math.min(100,Math.round((lost/t)*100));
+    document.getElementById(f).style.width=pct+'%';
+    document.getElementById(p).textContent=pct+'%';
+  });
+  const gw=Math.min(100,Math.round((lost/25)*100));
+  const gwe=document.getElementById('gw');
+  const gpwe=document.getElementById('gpw');
+  if(gwe){gwe.style.width=gw+'%';} if(gpwe){gpwe.textContent=gw+'%';}
+}
+function renderWHist() {
+  const el=document.getElementById('w-hist');
+  el.innerHTML=ST.weights.slice(-5).reverse().map(w=>`<span style="margin-right:10px">${w.date}: <strong>${w.val} kg</strong></span>`).join('');
+}
+
+// HEADER METRICS
+function updateHeaderMetrics() {
+  const cur=ST.weights[ST.weights.length-1]?.val||110;
+  const lost=Math.max(0,110-cur);
+  document.getElementById('h-wt').textContent=cur.toFixed(1)+' kg';
+  document.getElementById('h-lost').textContent=lost.toFixed(1)+' kg';
+  if (ST.startDate) {
+    const days=Math.floor((new Date()-new Date(ST.startDate))/86400000)+1;
+    document.getElementById('h-sob').textContent='dag '+days;
+    document.getElementById('h-cpap').textContent='dag '+days;
+    const cp=Math.min(100,Math.round((days/42)*100));
+    const sp=Math.min(100,Math.round((days/365)*100));
+    const gce=document.getElementById('gcpap'); const gpce=document.getElementById('gpcpap');
+    const gse=document.getElementById('gsob'); const gpse=document.getElementById('gpsob');
+    if(gce){gce.style.width=cp+'%';} if(gpce){gpce.textContent=cp+'%';}
+    if(gse){gse.style.width=sp+'%';} if(gpse){gpse.textContent=sp+'%';}
+  }
+}
+
+// HABITS
+function renderHabits() {
+  const c=document.getElementById('habit-cont');
+  if(!c) return;
+  c.innerHTML='';
+  HABITS.forEach(h=>{
+    const row=document.createElement('div');
+    row.className='hrow';
+    row.innerHTML=`<div class="hl">${h}</div><div class="hdays">${DAYS.map((d,i)=>{
+      const k=h+'_'+i; const on=ST.habits[k]; const td=i===todayIdx;
+      return `<div class="hd${on?' on':''}${td?' td':''}" onclick="tHabit('${h.replace(/'/g,"\\'")}',${i},this)">${d}</div>`;
+    }).join('')}</div>`;
+    c.appendChild(row);
+  });
+}
+function tHabit(h,i,el) {
+  const k=h+'_'+i;
+  ST.habits[k]=!ST.habits[k];
+  el.classList.toggle('on',ST.habits[k]);
+  sv('bk_hab_'+weekKey(),ST.habits);
+}
+
+// BLOOD VALUES
+function saveBV() {
+  const e={date:fmtDate(new Date()),s:document.getElementById('bv-s').value,b:document.getElementById('bv-b').value,h:document.getElementById('bv-h').value,w:document.getElementById('bv-w').value};
+  ST.bvHist.unshift(e);
+  if(ST.bvHist.length>30) ST.bvHist.pop();
+  sv('bk_bv',ST.bvHist);
+  renderBVHist();
+  toast('Waarden opgeslagen!');
+}
+function renderBVHist() {
+  const el=document.getElementById('bv-hist');
+  if(!el||!ST.bvHist.length) return;
+  el.innerHTML='<div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:500">Recente metingen</div>'+
+    ST.bvHist.slice(0,3).map(e=>`<div style="padding:5px 0;border-bottom:1px solid var(--border);font-size:12px"><strong>${e.date}</strong> &nbsp; Bloedsuiker: ${e.s||'—'} &nbsp; BD: ${e.b||'—'} &nbsp; HS: ${e.h||'—'}</div>`).join('');
+}
+
+// START DATE
+function saveStart() {
+  const v=document.getElementById('start-dt').value;
+  if(!v) return;
+  ST.startDate=v; sv('bk_sd',v);
+  renderStartInfo(); updateHeaderMetrics();
+  toast('Startdatum opgeslagen!');
+}
+function renderStartInfo() {
+  const el=document.getElementById('start-info');
+  const sd=document.getElementById('start-dt');
+  if(!el) return;
+  if(ST.startDate) {
+    sd.value=ST.startDate;
+    const days=Math.floor((new Date()-new Date(ST.startDate))/86400000)+1;
+    el.textContent=days+' dag'+(days!==1?'en':'')+' nuchter en op weg. Goed bezig, Bert!';
+  }
+}
+</script>
+</body>
+</html>
