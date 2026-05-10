@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Becko Money</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#085041;
+    --blue:#185FA5;--blue-light:#E6F1FB;--blue-dark:#0C447C;
+    --red:#E24B4A;--red-light:#FCEBEB;--red-dark:#A32D2D;
+    --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#633806;
+    --purple:#534AB7;--purple-light:#EEEDFE;--purple-dark:#26215C;
+    --gray:#5F5E5A;--gray-light:#F1EFE8;
+    --bg:#F8F7F4;--surface:#FFFFFF;--border:rgba(0,0,0,0.1);
+    --text:#1a1a1a;--text2:#666;--text3:#999;
+    --radius:12px;--radius-sm:8px;
+  }
+  body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+  h1,h2,.brand{font-family:'Space Grotesk',sans-serif}
+
+  .topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px;position:sticky;top:0;z-index:100}
+  .topbar-inner{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+  .brand{font-size:18px;font-weight:700;color:var(--blue);letter-spacing:-0.5px}
+  .brand span{color:var(--teal)}
+  .top-amount{text-align:right}
+  .top-amount .val{font-size:20px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+  .top-amount .sub{font-size:11px;color:var(--text3)}
+
+  .content{max-width:480px;margin:0 auto;padding:14px 16px}
+
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:10px}
+  .card-teal{background:var(--teal-light);border-color:var(--teal)}
+  .card-blue{background:var(--blue-light);border-color:var(--blue)}
+  .card-red{background:var(--red-light);border-color:var(--red)}
+  .card-purple{background:var(--purple-light);border-color:var(--purple)}
+  .card-amber{background:var(--amber-light);border-color:var(--amber)}
+
+  .lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+  .big-num{font-size:28px;font-weight:700;font-family:'Space Grotesk',sans-serif}
+  .med-num{font-size:20px;font-weight:600;font-family:'Space Grotesk',sans-serif}
+
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:10px}
+  .stat{background:var(--bg);border-radius:var(--radius-sm);padding:12px;text-align:center;border:1px solid var(--border)}
+
+  .pbar-bg{background:rgba(0,0,0,0.08);border-radius:99px;height:6px;overflow:hidden;margin:6px 0}
+  .pbar-fill{height:100%;border-radius:99px;transition:width .5s ease}
+
+  .pill{display:inline-flex;align-items:center;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:500}
+
+  .row-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px}
+  .row-item:last-child{border-bottom:none}
+  .row-item .lside{display:flex;align-items:center;gap:8px;color:var(--text2)}
+  .row-item .icon-wrap{width:28px;height:28px;border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+  .tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:6px 8px 12px;z-index:100}
+  .tab-bar-inner{max-width:480px;margin:0 auto;display:flex;width:100%;gap:4px}
+  .tab-btn{flex:1;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;padding:7px 2px;border-radius:var(--radius-sm);color:var(--text3);font-family:'Inter',sans-serif;transition:all .15s}
+  .tab-btn.active{background:var(--blue-light);color:var(--blue-dark);font-weight:500}
+  .tab-btn i{font-size:18px}
+
+  .inp-wrap{margin-bottom:14px}
+  .inp-wrap label{display:block;font-size:11px;color:var(--text3);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px}
+  .inp-wrap input{width:100%;font-size:15px;padding:9px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none;font-family:'Inter',sans-serif;transition:border-color .2s}
+  .inp-wrap input:focus{border-color:var(--blue)}
+
+  .save-btn{width:100%;padding:14px;border:none;border-radius:var(--radius);background:var(--blue);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;letter-spacing:.3px;transition:opacity .2s;margin-top:4px}
+  .save-btn:active{opacity:.85}
+
+  .action-btn{width:100%;padding:11px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;cursor:pointer;font-family:'Inter',sans-serif;margin-bottom:8px;text-align:left;display:flex;align-items:center;gap:8px}
+  .action-btn:active{background:var(--bg)}
+
+  .step-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:10px}
+  .step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;font-family:'Space Grotesk',sans-serif}
+
+  .timeline-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+  .timeline-item:last-child{border-bottom:none}
+
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <div class="brand">Becko <span>Money</span></div>
+      <div id="top-sub" style="font-size:11px;color:var(--text3)">laden...</div>
+    </div>
+    <div class="top-amount">
+      <div id="top-val" class="val">— EUR</div>
+      <div class="sub">vrij per maand</div>
+    </div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <button class="tab-btn active" onclick="showTab('overview')" id="tb-overview"><i class="ti ti-home"></i>Overzicht</button>
+    <button class="tab-btn" onclick="showTab('schulden')" id="tb-schulden"><i class="ti ti-credit-card"></i>Schulden</button>
+    <button class="tab-btn" onclick="showTab('budget')" id="tb-budget"><i class="ti ti-calculator"></i>Budget</button>
+    <button class="tab-btn" onclick="showTab('invest')" id="tb-invest"><i class="ti ti-chart-line"></i>Invest</button>
+    <button class="tab-btn" onclick="showTab('update')" id="tb-update"><i class="ti ti-pencil"></i>Update</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Opgeslagen!</div>
+
+<script>
+const STORAGE_KEY = 'becko_money_v1';
+const INCOME = 2500;
+const DEFAULTS = {
+  kbc: -750, mastercard: -2500, cofidis: -900,
+  lening_rest: 17700, saxo: 0, binance: 0, buffer: 0,
+  extra_income: 0, last_updated: null
+};
+
+let D = {...DEFAULTS};
+let curTab = 'overview';
+
+function load() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) D = {...DEFAULTS, ...JSON.parse(s)};
+  } catch(_) {}
+}
+
+async function save() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(D)); } catch(_) {}
+  showToast('Opgeslagen!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+const EUR = n => new Intl.NumberFormat('nl-BE', {style:'currency', currency:'EUR', maximumFractionDigits:0}).format(n);
+const ABS = n => EUR(Math.abs(n));
+
+function pbar(val, max, color) {
+  const pct = Math.min(100, Math.max(0, Math.round((val / max) * 100)));
+  return `<div class="pbar-bg"><div class="pbar-fill" style="width:${pct}%;background:${color}"></div></div>`;
+}
+
+function monthsTo(y, m) {
+  const now = new Date(), target = new Date(y, m - 1, 1);
+  return Math.max(0, Math.round((target - now) / (1000 * 60 * 60 * 24 * 30.5)));
+}
+
+function calcFlow() {
+  const out = 530 + 720 + 250 + 250;
+  const income = INCOME + (D.extra_income || 0);
+  return { out, vrij: income - out, income };
+}
+
+function shortDebt() {
+  return Math.abs(D.kbc || 0) + Math.abs(D.mastercard || 0) + Math.abs(D.cofidis || 0);
+}
+
+function totalDebt() {
+  return shortDebt() + (D.lening_rest || 0);
+}
+
+function debtFreeEst() {
+  const { vrij } = calcFlow();
+  const sd = shortDebt();
+  if (vrij <= 0 || sd <= 0) return 'Onbepaald';
+  const months = Math.ceil(sd / vrij);
+  const d = new Date(); d.setMonth(d.getMonth() + months);
+  return d.toLocaleDateString('nl-BE', {month:'long', year:'numeric'});
+}
+
+// ── OVERVIEW ──────────────────────────────────────────────────────────────
+function renderOverview() {
+  const { vrij, income } = calcFlow();
+  const vrijColor = vrij >= 0 ? 'var(--teal)' : 'var(--red)';
+  const debt = totalDebt();
+  const sd = shortDebt();
+  const lMnd = monthsTo(2029, 4);
+  const bMnd = monthsTo(2026, 11);
+  const totalAssets = (D.saxo || 0) + (D.binance || 0) + (D.buffer || 0);
+  const netWorth = totalAssets - debt;
+
+  document.getElementById('top-sub').textContent = `Bijgewerkt: ${D.last_updated || 'nog niet'}`;
+  document.getElementById('top-val').textContent = EUR(vrij);
+  document.getElementById('top-val').style.color = vrijColor;
+
+  return `
+    <div class="card card-blue" style="margin-bottom:12px">
+      <div class="grid2" style="margin-bottom:0">
+        <div style="text-align:center">
+          <div class="lbl" style="color:var(--blue)">Totale schuld</div>
+          <div class="med-num" style="color:var(--red-dark)">${ABS(-debt)}</div>
+        </div>
+        <div style="text-align:center;border-left:1px solid rgba(24,95,165,0.2);padding-left:12px">
+          <div class="lbl" style="color:var(--blue)">Netto vermogen</div>
+          <div class="med-num" style="color:${netWorth >= 0 ? 'var(--teal-dark)' : 'var(--red-dark)'}">${EUR(netWorth)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid2">
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Boete vrij</div>
+        <div style="font-size:17px;font-weight:700;color:var(--teal);font-family:'Space Grotesk',sans-serif">${bMnd}mnd</div>
+        <div style="font-size:10px;color:var(--text3)">nov 2026</div>
+      </div>
+      <div class="stat">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:3px">Lening vrij</div>
+        <div style="font-size:17px;font-weight:700;color:var(--blue);font-family:'Space Grotesk',sans-serif">${lMnd}mnd</div>
+        <div style="font-size:10px;color:var(--text3)">apr 2029</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Schulden kort — doelwit</div>
+      ${[
+        {label:'KBC zichtrekening', val:D.kbc||0, icon:'ti-building-bank'},
+        {label:'Mastercard', val:D.mastercard||0, icon:'ti-credit-card'},
+        {label:'Cofidis', val:D.cofidis||0, icon:'ti-credit-card'},
+      ].map(r => `
+        <div class="row-item">
+          <div class="lside">
+            <div class="icon-wrap" style="background:var(--red-light)"><i class="ti ${r.icon}" style="font-size:14px;color:var(--red)"></i></div>
+            ${r.label}
+          </div>
+          <span style="color:var(--red-dark);font-weight:600">${ABS(r.val)}</span>
+        </div>`).join('')}
+      ${pbar(0, Math.max(1, sd), 'var(--red)')}
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px">
+        <span>Totaal: ${ABS(-sd)}</span>
+        <span>Geschat vrij: ${debtFreeEst()}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Cashflow</div>
+      <div class="row-item">
+        <div class="lside"><div class="icon-wrap" style="background:var(--teal-light)"><i class="ti ti-arrow-down" style="font-size:14px;color:var(--teal)"></i></div>Netto inkomen</div>
+        <span style="color:var(--teal-dark);font-weight:600">+${EUR(income)}</span>
+      </div>
+      <div class="row-item">
+        <div class="lside"><div class="icon-wrap" style="background:var(--red-light)"><i class="ti ti-arrow-up" style="font-size:14px;color:var(--red)"></i></div>Vaste lasten</div>
+        <span style="color:var(--red-dark);font-weight:600">-${EUR(calcFlow().out)}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0 4px;font-weight:600;font-size:14px">
+        <span>Vrij beschikbaar</span>
+        <span style="color:${vrijColor};font-family:'Space Grotesk',sans-serif">${EUR(vrij)}</span>
+      </div>
+      ${pbar(Math.max(0, vrij), income, vrij >= 0 ? 'var(--teal)' : 'var(--red)')}
+    </div>
+
+    <div class="card">
+      <div class="lbl">Portfolio</div>
+      ${[
+        {label:'Saxo Bank', val:D.saxo||0, icon:'ti-chart-line', c:'var(--purple)', bg:'var(--purple-light)'},
+        {label:'Binance', val:D.binance||0, icon:'ti-currency-bitcoin', c:'var(--amber)', bg:'var(--amber-light)'},
+        {label:'Buffer / spaar', val:D.buffer||0, icon:'ti-piggy-bank', c:'var(--teal)', bg:'var(--teal-light)'},
+      ].map(r => `
+        <div class="row-item">
+          <div class="lside"><div class="icon-wrap" style="background:${r.bg}"><i class="ti ${r.icon}" style="font-size:14px;color:${r.c}"></i></div>${r.label}</div>
+          <span style="color:${(r.val||0) >= 0 ? 'var(--teal-dark)' : 'var(--red-dark)'};font-weight:600">${EUR(r.val||0)}</span>
+        </div>`).join('')}
+    </div>
+
+    <div class="card card-teal">
+      <div style="font-size:11px;color:var(--teal-dark);margin-bottom:8px;font-weight:500">Na boete (nov 2026) — +720 EUR/mnd vrij</div>
+      <div style="font-size:11px;color:var(--teal-dark);margin-bottom:4px">Na lening (apr 2029) — +1.250 EUR/mnd vrij extra</div>
+      <div style="font-size:13px;color:var(--teal-dark);font-weight:600;margin-top:6px">Vrij in 2029: ${EUR(vrij + 1250)}/mnd → Kenia bouwen</div>
+    </div>
+  `;
+}
+
+// ── SCHULDEN ──────────────────────────────────────────────────────────────
+function renderSchulden() {
+  const lMnd = monthsTo(2029, 4);
+  const bMnd = monthsTo(2026, 11);
+
+  return `
+    <div style="font-size:16px;font-weight:600;font-family:'Space Grotesk',sans-serif;margin-bottom:12px;color:var(--text)">Schulden</div>
+
+    <div class="card card-teal" style="margin-bottom:16px">
+      <div style="font-size:12px;font-weight:500;color:var(--teal-dark);margin-bottom:8px">Strategisch plan</div>
+      ${[
+        {n:1, t:'Boete uitzitten', s:'Verplichting — nov 2026', c:'var(--red)'},
+        {n:2, t:'KBC + kaarten wegwerken', s:'Met vrij budget aanvallen', c:'var(--amber)'},
+        {n:3, t:'Lening loopt af', s:'Automatisch — apr 2029', c:'var(--blue)'},
+        {n:4, t:'Investeren + Kenia', s:'Vanaf 2029', c:'var(--teal)'},
+      ].map(s => `
+        <div class="step-row">
+          <div class="step-num" style="background:${s.c}22;color:${s.c}">${s.n}</div>
+          <div><div style="font-size:13px;font-weight:500;color:var(--text)">${s.t}</div><div style="font-size:11px;color:var(--text3)">${s.s}</div></div>
+        </div>`).join('')}
+    </div>
+
+    ${[
+      {label:'Boete', icon:'ti-gavel', c:'var(--red)', bg:'var(--red-light)', border:'var(--red)', amount: EUR(720)+'/mnd', remaining: EUR(720*bMnd), note:'Vaste verplichting', end:'november 2026', mnd:bMnd},
+      {label:'Persoonlijke lening', icon:'ti-file-invoice', c:'var(--amber)', bg:'var(--amber-light)', border:'var(--amber)', amount: EUR(530)+'/mnd', remaining: EUR(D.lening_rest||17700), note:'Niet vervroegd aflossen', end:'april 2029', mnd:lMnd},
+      {label:'KBC zichtrekening', icon:'ti-building-bank', c:'var(--red)', bg:'var(--red-light)', border:'var(--red)', amount:null, remaining: ABS(D.kbc||0), note:'Eerst wegwerken', end:null, mnd:null},
+      {label:'Mastercard', icon:'ti-credit-card', c:'var(--red)', bg:'var(--red-light)', border:'var(--red)', amount:null, remaining: ABS(D.mastercard||0), note:'Hoge rente — prioriteit', end:null, mnd:null},
+      {label:'Cofidis card', icon:'ti-credit-card', c:'var(--red)', bg:'var(--red-light)', border:'var(--red)', amount:null, remaining: ABS(D.cofidis||0), note:'Hoge rente — prioriteit', end:null, mnd:null},
+    ].map(d => `
+      <div class="card" style="border-color:${d.border};margin-bottom:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div style="display:flex;gap:10px;align-items:center">
+            <div class="icon-wrap" style="width:34px;height:34px;background:${d.bg};border-radius:var(--radius-sm)">
+              <i class="ti ${d.icon}" style="font-size:16px;color:${d.c}"></i>
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500">${d.label}</div>
+              <div style="font-size:11px;color:var(--text3)">${d.note}</div>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:16px;font-weight:700;color:${d.c};font-family:'Space Grotesk',sans-serif">${d.remaining}</div>
+            ${d.amount ? `<div style="font-size:10px;color:var(--text3)">${d.amount}</div>` : ''}
+          </div>
+        </div>
+        ${d.end ? `
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:8px;padding-top:8px;border-top:1px solid ${d.border}22">
+            <span><i class="ti ti-calendar" style="font-size:11px;margin-right:3px"></i>${d.end}</span>
+            <span>${d.mnd} maanden</span>
+          </div>` : ''}
+      </div>`).join('')}
+
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">Vrijgekomen budget na aflossingen</div>
+      <div class="timeline-item">
+        <span style="color:var(--text2)">Nov 2026 — boete klaar</span>
+        <span style="color:var(--teal-dark);font-weight:600">+${EUR(720)}/mnd</span>
+      </div>
+      <div class="timeline-item">
+        <span style="color:var(--text2)">Apr 2029 — lening klaar</span>
+        <span style="color:var(--teal-dark);font-weight:600">+${EUR(530)}/mnd</span>
+      </div>
+      <div style="padding:10px 0 2px;font-size:14px;font-weight:600;color:var(--teal-dark);font-family:'Space Grotesk',sans-serif">
+        Totaal: +${EUR(1250)}/mnd extra
+      </div>
+    </div>
+  `;
+}
+
+// ── BUDGET ────────────────────────────────────────────────────────────────
+function renderBudget() {
+  const { vrij, income, out } = calcFlow();
+  const vrijColor = vrij >= 0 ? 'var(--teal)' : 'var(--red)';
+  const vrijBg = vrij >= 0 ? 'var(--teal-light)' : 'var(--red-light)';
+  const vrijBorder = vrij >= 0 ? 'var(--teal)' : 'var(--red)';
+
+  const uitItems = [
+    {label:'Persoonlijke lening', icon:'ti-file-invoice', val:530, note:'tot apr 2029', c:'var(--amber)'},
+    {label:'Boete', icon:'ti-gavel', val:720, note:'tot nov 2026', c:'var(--red)'},
+    {label:'Bijdrage Kenia', icon:'ti-heart', val:250, note:'Joyce & kinderen', c:'var(--blue)'},
+    {label:'Vaste kosten', icon:'ti-receipt', val:250, note:'telefoon, abonnementen', c:'var(--gray)'},
+  ];
+
+  return `
+    <div style="font-size:16px;font-weight:600;font-family:'Space Grotesk',sans-serif;margin-bottom:12px">Maandbudget</div>
+
+    <div class="card" style="background:${vrijBg};border-color:${vrijBorder};margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div>
+          <div style="font-size:11px;color:${vrijColor};margin-bottom:2px">Vrij beschikbaar</div>
+          <div class="big-num" style="color:${vrijColor}">${EUR(vrij)}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:11px;color:var(--text3)">${Math.round((vrij/income)*100)}% van inkomen</div>
+          <div style="font-size:11px;color:var(--text3)">van ${EUR(income)}</div>
+        </div>
+      </div>
+      ${pbar(Math.max(0, vrij), income, vrij >= 0 ? 'var(--teal)' : 'var(--red)')}
+    </div>
+
+    <div class="card">
+      <div class="lbl">Inkomsten</div>
+      <div class="row-item">
+        <div class="lside"><div class="icon-wrap" style="background:var(--teal-light)"><i class="ti ti-building" style="font-size:14px;color:var(--teal)"></i></div>Netto loon Gencom</div>
+        <span style="color:var(--teal-dark);font-weight:600">+${EUR(2500)}</span>
+      </div>
+      ${(D.extra_income || 0) > 0 ? `
+        <div class="row-item">
+          <div class="lside"><div class="icon-wrap" style="background:var(--teal-light)"><i class="ti ti-briefcase" style="font-size:14px;color:var(--teal)"></i></div>Extra inkomsten</div>
+          <span style="color:var(--teal-dark);font-weight:600">+${EUR(D.extra_income)}</span>
+        </div>` : ''}
+      <div style="display:flex;justify-content:space-between;padding:9px 0 2px;font-weight:600;font-size:13px">
+        <span>Totaal in</span><span style="color:var(--teal-dark)">+${EUR(income)}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Vaste uitgaven</div>
+      ${uitItems.map(i => `
+        <div class="row-item">
+          <div>
+            <div class="lside"><div class="icon-wrap" style="background:${i.c}22"><i class="ti ${i.icon}" style="font-size:14px;color:${i.c}"></i></div>${i.label}</div>
+            ${i.note ? `<div style="font-size:10px;color:var(--text3);margin-left:36px">${i.note}</div>` : ''}
+          </div>
+          <span style="color:var(--red-dark);font-weight:600">-${EUR(i.val)}</span>
+        </div>`).join('')}
+      <div style="display:flex;justify-content:space-between;padding:9px 0 2px;font-weight:600;font-size:13px">
+        <span>Totaal uit</span><span style="color:var(--red-dark)">-${EUR(out)}</span>
+      </div>
+    </div>
+
+    <div class="card card-teal">
+      <div style="font-size:12px;font-weight:500;color:var(--teal-dark);margin-bottom:6px">Toekomstscenario's</div>
+      <div class="timeline-item" style="border-color:rgba(13,80,65,0.15)">
+        <span style="font-size:12px;color:var(--teal-dark)">Nu</span>
+        <span style="font-weight:600;color:var(--teal-dark)">${EUR(vrij)}/mnd vrij</span>
+      </div>
+      <div class="timeline-item" style="border-color:rgba(13,80,65,0.15)">
+        <span style="font-size:12px;color:var(--teal-dark)">Nov 2026 — boete weg</span>
+        <span style="font-weight:600;color:var(--teal-dark)">${EUR(vrij+720)}/mnd vrij</span>
+      </div>
+      <div class="timeline-item" style="border-color:rgba(13,80,65,0.15)">
+        <span style="font-size:12px;color:var(--teal-dark)">Apr 2029 — lening weg</span>
+        <span style="font-weight:600;color:var(--teal-dark)">${EUR(vrij+1250)}/mnd vrij</span>
+      </div>
+    </div>
+  `;
+}
+
+// ── INVEST ────────────────────────────────────────────────────────────────
+function renderInvest() {
+  const total = (D.saxo||0) + (D.binance||0) + (D.buffer||0);
+  const bufferDoel = 2500;
+  const bufferPct = Math.min(100, Math.round(((D.buffer||0)/bufferDoel)*100));
+
+  return `
+    <div style="font-size:16px;font-weight:600;font-family:'Space Grotesk',sans-serif;margin-bottom:12px">Investeringen</div>
+
+    <div class="card card-purple" style="margin-bottom:12px">
+      <div class="lbl" style="color:var(--purple)">Totale portfolio</div>
+      <div class="big-num" style="color:var(--purple-dark)">${EUR(total)}</div>
+      <div style="font-size:11px;color:var(--purple);margin-top:3px">Saxo + Binance + buffer</div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div class="lbl">Saxo Bank — ETF & aandelen</div><div style="font-size:20px;font-weight:700;color:var(--purple-dark);font-family:'Space Grotesk',sans-serif">${EUR(D.saxo||0)}</div></div>
+        <div class="icon-wrap" style="width:40px;height:40px;background:var(--purple-light)"><i class="ti ti-chart-line" style="font-size:20px;color:var(--purple)"></i></div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;padding:10px;background:var(--bg);border-radius:var(--radius-sm)">
+        Aanbevolen: <strong>IWDA</strong> (wereldwijd) + <strong>EMIM</strong> (emerging markets)<br>
+        Ierse domicilie — efficiënt voor Belgische belasting<br>
+        Meerwaardebelasting 10% solidarity contribution (2026)
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div class="lbl">Binance — crypto</div><div style="font-size:20px;font-weight:700;color:var(--amber-dark);font-family:'Space Grotesk',sans-serif">${EUR(D.binance||0)}</div></div>
+        <div class="icon-wrap" style="width:40px;height:40px;background:var(--amber-light)"><i class="ti ti-currency-bitcoin" style="font-size:20px;color:var(--amber)"></i></div>
+      </div>
+      <div style="font-size:12px;color:var(--text3);padding:8px 10px;background:var(--bg);border-radius:var(--radius-sm)">
+        Hoog risico — pas investeren nadat KBC/kaartschulden volledig afgelost zijn
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div><div class="lbl">Buffer / noodfonds</div><div style="font-size:20px;font-weight:700;color:var(--teal-dark);font-family:'Space Grotesk',sans-serif">${EUR(D.buffer||0)}</div></div>
+        <div style="font-size:12px;color:var(--text3)">${bufferPct}% van doel</div>
+      </div>
+      ${pbar(D.buffer||0, bufferDoel, 'var(--teal)')}
+      <div style="font-size:11px;color:var(--text3);margin-top:4px">Doel: ${EUR(bufferDoel)} — 1 maand uitgaven als veiligheid</div>
+    </div>
+
+    <div class="card card-teal">
+      <div style="font-size:12px;font-weight:500;color:var(--teal-dark);margin-bottom:10px">Aanbevolen volgorde</div>
+      ${[
+        {n:1, t:'Buffer 1.000 EUR opbouwen', s:'Direct starten', c:'var(--teal)'},
+        {n:2, t:'KBC + kaartschulden wegwerken', s:'Vrij budget aanwenden', c:'var(--red)'},
+        {n:3, t:'Buffer aanvullen tot 2.500 EUR', s:'Na kaartschulden', c:'var(--blue)'},
+        {n:4, t:'Saxo ETF starten — IWDA/EMIM', s:'Na nov 2026 — boete vrijgekomen', c:'var(--purple)'},
+        {n:5, t:'Crypto Binance', s:'Na lening apr 2029', c:'var(--amber)'},
+      ].map(s => `
+        <div class="step-row">
+          <div class="step-num" style="background:${s.c}22;color:${s.c}">${s.n}</div>
+          <div><div style="font-size:13px;font-weight:500;color:var(--teal-dark)">${s.t}</div><div style="font-size:11px;color:var(--teal)">${s.s}</div></div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+// ── UPDATE ────────────────────────────────────────────────────────────────
+function renderUpdate() {
+  return `
+    <div style="font-size:16px;font-weight:600;font-family:'Space Grotesk',sans-serif;margin-bottom:12px">Cijfers bijwerken</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">Werk maandelijks bij voor een accurate weergave</div>
+
+    <div class="card">
+      <div class="lbl">KBC & schulden</div>
+      <div class="inp-wrap"><label>KBC zichtrekening (bv. -750)</label><input type="number" id="u-kbc" value="${D.kbc||''}" placeholder="-750" step="1"></div>
+      <div class="inp-wrap"><label>Mastercard schuld (bv. -2500)</label><input type="number" id="u-mc" value="${D.mastercard||''}" placeholder="-2500" step="1"></div>
+      <div class="inp-wrap"><label>Cofidis schuld (bv. -900)</label><input type="number" id="u-cof" value="${D.cofidis||''}" placeholder="-900" step="1"></div>
+      <div class="inp-wrap" style="margin-bottom:0"><label>Resterend op persoonlijke lening</label><input type="number" id="u-len" value="${D.lening_rest||''}" placeholder="17700" step="1"></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Investeringen & buffer</div>
+      <div class="inp-wrap"><label>Saxo Bank waarde (EUR)</label><input type="number" id="u-saxo" value="${D.saxo||''}" placeholder="0" step="1"></div>
+      <div class="inp-wrap"><label>Binance waarde (EUR equivalent)</label><input type="number" id="u-bin" value="${D.binance||''}" placeholder="0" step="1"></div>
+      <div class="inp-wrap" style="margin-bottom:0"><label>Buffer / spaargeld (EUR)</label><input type="number" id="u-buf" value="${D.buffer||''}" placeholder="0" step="1"></div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Extra inkomsten deze maand</div>
+      <div class="inp-wrap" style="margin-bottom:0"><label>Freelance, bijklussen, data annotation (EUR)</label><input type="number" id="u-extra" value="${D.extra_income||''}" placeholder="0" step="1"></div>
+    </div>
+
+    <button class="save-btn" onclick="saveUpdate()">
+      <i class="ti ti-device-floppy" style="font-size:15px;vertical-align:-2px;margin-right:8px"></i>Opslaan
+    </button>
+  `;
+}
+
+function saveUpdate() {
+  const g = id => { const el = document.getElementById(id); return el ? (parseFloat(el.value) || 0) : 0; };
+  D.kbc = g('u-kbc') || D.kbc;
+  D.mastercard = g('u-mc') || D.mastercard;
+  D.cofidis = g('u-cof') || D.cofidis;
+  D.lening_rest = g('u-len') || D.lening_rest;
+  D.saxo = g('u-saxo');
+  D.binance = g('u-bin');
+  D.buffer = g('u-buf');
+  D.extra_income = g('u-extra');
+  D.last_updated = new Date().toLocaleDateString('nl-BE');
+  save();
+  showTab('overview');
+}
+
+function showTab(t) {
+  curTab = t;
+  ['overview','schulden','budget','invest','update'].forEach(id => {
+    const b = document.getElementById('tb-' + id);
+    if (b) b.className = 'tab-btn' + (id === t ? ' active' : '');
+  });
+  const renders = {overview:renderOverview, schulden:renderSchulden, budget:renderBudget, invest:renderInvest, update:renderUpdate};
+  document.getElementById('content').innerHTML = (renders[t] || renderOverview)();
+}
+
+load();
+showTab('overview');
+</script>
+</body>
+</html>

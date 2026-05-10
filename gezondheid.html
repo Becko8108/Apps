@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Becko Health">
+<meta name="theme-color" content="#1D9E75">
+<title>Becko Health</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.0.0/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#085041;
+  --blue:#185FA5;--blue-light:#E6F1FB;
+  --amber:#BA7517;--amber-light:#FAEEDA;
+  --red:#E24B4A;--red-light:#FCEBEB;
+  --purple:#534AB7;--purple-light:#EEEDFE;
+  --coral:#D85A30;--coral-light:#FAECE7;
+  --gray:#5F5E5A;--gray-light:#F1EFE8;
+  --bg:#F8F7F4;--surface:#FFFFFF;--border:rgba(0,0,0,0.1);
+  --text:#1a1a1a;--text2:#666;--text3:#999;
+  --radius:14px;--radius-sm:8px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 16px 12px;position:sticky;top:0;z-index:100}
+.topbar-inner{max-width:480px;margin:0 auto;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:17px;font-weight:700;color:var(--teal)}
+.topbar-right{text-align:right}
+.topbar-right .val{font-size:19px;font-weight:600;color:var(--text)}
+.topbar-right .sub{font-size:10px;color:var(--text3)}
+.content{max-width:480px;margin:0 auto;padding:12px 14px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:13px 15px;margin-bottom:10px}
+.lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;font-weight:500}
+.pbar{background:rgba(0,0,0,0.07);border-radius:99px;height:7px;overflow:hidden;margin:5px 0}
+.pbar-fill{height:100%;border-radius:99px;transition:width .5s}
+.pill{display:inline-flex;align-items:center;border-radius:99px;padding:2px 9px;font-size:10px;font-weight:500}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.stat{background:var(--bg);border-radius:var(--radius-sm);padding:11px;text-align:center;border:1px solid var(--border)}
+.row-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;gap:8px}
+.row-item:last-child{border-bottom:none}
+.row-l{color:var(--text2);flex:1;display:flex;align-items:center;gap:7px}
+.row-r{font-weight:600;text-align:right;flex-shrink:0;font-size:12px}
+.tab-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;padding:6px 8px 12px;z-index:100}
+.tab-bar-inner{max-width:480px;margin:0 auto;display:flex;width:100%;gap:3px}
+.tab-btn{flex:1;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:9px;padding:6px 2px;border-radius:var(--radius-sm);color:var(--text3);font-family:inherit;transition:all .15s}
+.tab-btn.active{background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+.tab-btn i{font-size:18px}
+.inp-group{margin-bottom:12px}
+.inp-group label{display:block;font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;font-weight:500}
+.inp-group input,.inp-group textarea,.inp-group select{width:100%;font-family:inherit;font-size:14px;padding:8px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none;transition:border-color .2s}
+.inp-group input:focus{border-color:var(--teal)}
+.inp-group textarea{resize:vertical;min-height:46px}
+.mood-btn{flex:1;border:1px solid var(--border);background:var(--surface);border-radius:var(--radius-sm);padding:8px 2px;font-size:16px;cursor:pointer;text-align:center}
+.mood-btn.sel{border-color:var(--amber);background:var(--amber-light)}
+.wtype-btn{padding:6px 11px;border-radius:99px;border:1px solid var(--border);background:var(--surface);font-size:11px;cursor:pointer;color:var(--text2);font-family:inherit}
+.wtype-btn.sel{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark)}
+.save-btn{width:100%;padding:13px;border:none;border-radius:var(--radius);background:var(--teal);color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:opacity .2s;margin-top:4px}
+.save-btn:active{opacity:.85}
+.day-chip{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500}
+.no-data{font-size:12px;color:var(--text3);font-style:italic;margin-top:6px;display:flex;align-items:center;gap:4px}
+.hero{background:#E1F5EE;border:1px solid #5DCAA5;border-radius:var(--radius);padding:18px 16px;margin-bottom:10px;text-align:center}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:99px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div>
+      <div class="brand">Becko Health</div>
+      <div id="top-sub" style="font-size:10px;color:var(--text3)">laden...</div>
+    </div>
+    <div class="topbar-right">
+      <div id="top-weight" class="val">— kg</div>
+      <div class="sub">doel: 85 kg</div>
+    </div>
+  </div>
+</div>
+<div class="content" id="content"></div>
+<div class="tab-bar">
+  <div class="tab-bar-inner">
+    <button class="tab-btn active" onclick="showTab('home')" id="tb-home"><i class="ti ti-home"></i>Home</button>
+    <button class="tab-btn" onclick="showTab('log')" id="tb-log"><i class="ti ti-pencil"></i>Log</button>
+    <button class="tab-btn" onclick="showTab('training')" id="tb-training"><i class="ti ti-barbell"></i>Training</button>
+    <button class="tab-btn" onclick="showTab('history')" id="tb-history"><i class="ti ti-chart-bar"></i>Historie</button>
+    <button class="tab-btn" onclick="showTab('medical')" id="tb-medical"><i class="ti ti-heart-rate-monitor"></i>Medisch</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const SK='becko_health_v3';
+const START=new Date('2026-05-10');
+const WS=110,WG=85;
+let logs=[],today={weight:'',workout:'',wtype:'',sleep:'',mood:0,energy:5,meds:false,cpap:false,food:'',notes:'',sugar:'',systolic:'',diastolic:'',steps:''};
+let curTab='home';
+
+function dSince(d){return Math.max(0,Math.floor((new Date()-d)/86400000));}
+function todayStr(){return new Date().toISOString().split('T')[0];}
+function fmtDate(s){return new Date(s).toLocaleDateString('nl-BE',{day:'numeric',month:'short'});}
+function week(){return Math.max(1,Math.floor((new Date()-START)/(7*86400000))+1);}
+function fitnessLv(){
+  const w=week(),r=logs.slice(-7);
+  const wd=r.filter(l=>l.workout).length,ea=r.length?r.reduce((a,l)=>a+(l.energy||5),0)/r.length:5;
+  let lv=Math.min(5,Math.floor(w/4)+1);
+  if(wd>=5&&ea>=7)lv=Math.min(5,lv+1);
+  if(wd<=2||ea<4)lv=Math.max(1,lv-1);
+  return lv;
+}
+const PLANS={
+  1:{name:'Starter',bike:'65km/dag e-bike (2×32.5km) — turbostand OK',str:'3×10 dumbbells fullbody licht',swim:'10×25m schoolslag eigen tempo',sl:10},
+  2:{name:'Opbouw',bike:'65km/dag e-bike + 30km koersfiets za',str:'3×12 dumbbells +10% gewicht',swim:'15×25m iets sneller',sl:15},
+  3:{name:'Kracht',bike:'65km/dag e-bike + 50km koersfiets za',str:'4×10 compound oefeningen',swim:'20×25m interval sets',sl:20},
+  4:{name:'Intensief',bike:'65km/dag e-bike + 70km koers @ 25km/u',str:'4×12 supersets',swim:'30×25m progressief',sl:30},
+  5:{name:'Elite',bike:'65km/dag e-bike + 100km+ @ 28-30km/u',str:'5×10 periodisering zwaar',swim:'40×25m doelsnelheid!',sl:40}
+};
+function pbar(v,m,c){const p=Math.min(100,Math.max(0,Math.round((v/m)*100)));return `<div class="pbar"><div class="pbar-fill" style="width:${p}%;background:${c}"></div></div>`;}
+function noData(msg){return `<div class="no-data"><i class="ti ti-info-circle" style="font-size:11px"></i>${msg}</div>`;}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+function milestoneHTML(days){
+  const ms=[{d:7,l:'1 week',e:'ti-seedling'},{d:14,l:'2 weken',e:'ti-flame'},{d:30,l:'1 maand',e:'ti-fire'},{d:60,l:'2 mnd',e:'ti-bolt'},{d:90,l:'90 dagen',e:'ti-trophy'},{d:180,l:'6 mnd',e:'ti-crown'},{d:365,l:'1 jaar',e:'ti-diamond'}];
+  const earned=ms.filter(m=>days>=m.d);
+  const next=ms.find(m=>days<m.d);
+  let h=earned.map(m=>`<span class="pill" style="background:#9FE1CB;color:#085041;margin:2px"><i class="ti ${m.e}" style="font-size:10px;margin-right:2px"></i>${m.l}</span>`).join('');
+  if(!earned.length)h='<span style="font-size:12px;color:#0F6E56">Start op 10 mei — dag 0 🌱</span>';
+  const nxt=next?`<div style="font-size:11px;color:#0F6E56;margin-top:7px">Volgende: ${next.l} — nog ${next.d-days} dagen</div>`:'';
+  return h+nxt;
+}
+
+function renderHome(){
+  const days=dSince(START),wk=week(),lv=fitnessLv(),plan=PLANS[lv];
+  const wl=logs.filter(l=>l.weight),lastW=wl.length?parseFloat(wl.slice(-1)[0].weight):null;
+  const lost=lastW!==null?(WS-lastW).toFixed(1):null;
+  const rem=lastW!==null?(lastW-WG).toFixed(1):null;
+  const pct=lastW!==null?Math.max(0,Math.round(((WS-lastW)/(WS-WG))*100)):0;
+  document.getElementById('top-sub').textContent=`Dag ${days} clean · Week ${wk} · Level ${lv}`;
+  document.getElementById('top-weight').textContent=lastW?lastW+' kg':'— kg';
+  const l7=logs.filter(l=>{const d=new Date(l.date),c=new Date();c.setDate(c.getDate()-7);return d>=c;});
+  const wouts=l7.filter(l=>l.workout).length;
+  const sl=l7.filter(l=>l.sleep),avgsl=sl.length?(sl.reduce((a,l)=>a+parseFloat(l.sleep),0)/sl.length).toFixed(1):'—';
+  const stl=l7.filter(l=>l.steps&&l.steps>0),avgst=stl.length?Math.round(stl.reduce((a,l)=>a+parseInt(l.steps),0)/stl.length).toLocaleString('nl-BE'):'—';
+  const done=logs.some(l=>l.date===todayStr());
+  return `
+    <div class="hero">
+      <div style="font-size:50px;font-weight:700;color:#085041;line-height:1">${days}</div>
+      <div style="font-size:12px;color:#0F6E56;margin:4px 0 10px">dagen clean — alcohol · coke · sigaretten</div>
+      <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:4px">${milestoneHTML(days)}</div>
+    </div>
+    <div class="card">
+      <div class="lbl">⚖️ Gewichtsdoel — 85 kg</div>
+      ${lastW!==null?`
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px">
+          <span style="font-size:26px;font-weight:700">${lastW} kg</span>
+          <span style="color:var(--teal);font-size:13px;font-weight:600">${pct}%</span>
+        </div>
+        ${pbar(WS-lastW,WS-WG,'var(--teal)')}
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:4px">
+          <span>Start 110 kg</span><span>Verloren: ${lost} kg</span><span>Nog: ${rem} kg</span>
+        </div>`:noData('Log je eerste gewicht')}
+    </div>
+    <div class="grid2">
+      <div class="stat"><div style="font-size:20px;font-weight:700;color:var(--blue)">${wouts}/5</div><div style="font-size:10px;color:var(--text3);margin-top:2px">trainingen 7d</div></div>
+      <div class="stat"><div style="font-size:20px;font-weight:700;color:var(--purple)">${avgsl}u</div><div style="font-size:10px;color:var(--text3);margin-top:2px">gem. slaap 7d</div></div>
+    </div>
+    <div class="grid2">
+      <div class="stat"><div style="font-size:20px;font-weight:700;color:var(--coral)">${avgst}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">gem. stappen 7d</div></div>
+      <div class="stat"><div style="font-size:20px;font-weight:700;color:var(--amber)">${l7.filter(l=>l.meds).length}/${l7.length}</div><div style="font-size:10px;color:var(--text3);margin-top:2px">medicatie 7d</div></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="lbl" style="margin-bottom:0">Plan week ${wk}</div>
+        <span class="pill" style="background:var(--teal-light);color:var(--teal-dark)">${plan.name} · L${lv}</span>
+      </div>
+      <div style="font-size:12px;color:var(--text2);display:flex;flex-direction:column;gap:5px">
+        <div><i class="ti ti-bike" style="font-size:13px;margin-right:5px;color:var(--teal)"></i>${plan.bike}</div>
+        <div><i class="ti ti-barbell" style="font-size:13px;margin-right:5px;color:var(--coral)"></i>${plan.str}</div>
+        <div><i class="ti ti-wave-sine" style="font-size:13px;margin-right:5px;color:var(--blue)"></i>${plan.swim}</div>
+        <div><i class="ti ti-walk" style="font-size:13px;margin-right:5px;color:var(--purple)"></i>Min. 6.000 stappen/dag</div>
+      </div>
+    </div>
+    ${!done?`<button class="save-btn" onclick="showTab('log')"><i class="ti ti-plus" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>Log vandaag</button>`:`<div class="card" style="text-align:center;color:var(--teal)"><i class="ti ti-check" style="font-size:16px;vertical-align:-2px;margin-right:4px"></i>Vandaag gelogd</div>`}`;
+}
+
+function renderLog(){
+  const wl=logs.filter(l=>l.weight),lastW=wl.length?wl.slice(-1)[0].weight:WS;
+  return `
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px">Log vandaag — ${fmtDate(todayStr())}</div>
+    <div class="card">
+      <div class="lbl">⚖️ Gewicht (kg)</div>
+      <input type="number" step="0.1" placeholder="Laatste: ${lastW} kg" value="${today.weight}" oninput="today.weight=this.value" style="width:100%;font-size:16px;padding:8px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none">
+    </div>
+    <div class="card">
+      <div class="lbl">🏃 Training</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+        ${['e-bike','koersfiets','kracht','zwemmen','wandelen','rust'].map(t=>`<button class="wtype-btn${today.wtype===t?' sel':''}" onclick="selWT('${t}')">${t}</button>`).join('')}
+      </div>
+      <input type="text" placeholder="Details (bv: 65km, 45 min, HR 145)" value="${today.workout}" oninput="today.workout=this.value" style="width:100%;font-size:13px;padding:8px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none">
+    </div>
+    <div class="grid2">
+      <div class="card" style="margin-bottom:0">
+        <div class="lbl">🚶 Stappen</div>
+        <input type="number" step="100" placeholder="6000" value="${today.steps||''}" oninput="today.steps=this.value" style="width:100%;font-size:16px;padding:8px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none">
+      </div>
+      <div class="card" style="margin-bottom:0">
+        <div class="lbl">😴 Slaap (uur)</div>
+        <input type="number" step="0.5" min="0" max="12" placeholder="7.5" value="${today.sleep}" oninput="today.sleep=this.value" style="width:100%;font-size:16px;padding:8px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none">
+      </div>
+    </div>
+    <div class="card" style="margin-top:10px">
+      <div style="display:flex;justify-content:space-between"><div class="lbl">⚡ Energie</div><span id="elbl" style="font-size:12px;color:var(--amber)">${today.energy}/10</span></div>
+      <input type="range" min="1" max="10" value="${today.energy}" oninput="today.energy=+this.value;document.getElementById('elbl').textContent=this.value+'/10'" style="width:100%;margin-top:6px;accent-color:var(--amber)">
+    </div>
+    <div class="card">
+      <div class="lbl">😊 Humeur</div>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        ${[1,2,3,4,5].map(n=>`<button class="mood-btn${today.mood===n?' sel':''}" onclick="selMood(${n})">${['😞','😕','😐','🙂','😄'][n-1]}</button>`).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <div class="lbl">💊 Medisch</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <label style="display:flex;align-items:center;gap:8px;padding:9px;border:1px solid ${today.meds?'var(--teal)':'var(--border)'};border-radius:var(--radius-sm);background:${today.meds?'var(--teal-light)':'transparent'};cursor:pointer">
+          <input type="checkbox" ${today.meds?'checked':''} onchange="today.meds=this.checked;rerender()" style="width:15px;height:15px;accent-color:var(--teal)">
+          <span style="font-size:12px;color:${today.meds?'var(--teal-dark)':'var(--text2)'}">Medicatie</span>
+        </label>
+        <label style="display:flex;align-items:center;gap:8px;padding:9px;border:1px solid ${today.cpap?'var(--blue)':'var(--border)'};border-radius:var(--radius-sm);background:${today.cpap?'var(--blue-light)':'transparent'};cursor:pointer">
+          <input type="checkbox" ${today.cpap?'checked':''} onchange="today.cpap=this.checked;rerender()" style="width:15px;height:15px;accent-color:var(--blue)">
+          <span style="font-size:12px;color:${today.cpap?'var(--blue)':'var(--text2)'}">CPAP</span>
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div><div class="lbl" style="margin-bottom:3px">Bloedsuiker (mmol/L)</div><input type="number" step="0.1" placeholder="bv. 6.8" value="${today.sugar}" oninput="today.sugar=this.value" style="width:100%;font-size:13px;padding:7px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none"></div>
+        <div><div class="lbl" style="margin-bottom:3px">Bloeddruk (sys/dia)</div><div style="display:flex;gap:4px;align-items:center"><input type="number" placeholder="120" value="${today.systolic}" oninput="today.systolic=this.value" style="width:100%;font-size:13px;padding:7px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none"><span style="color:var(--text3);flex-shrink:0">/</span><input type="number" placeholder="80" value="${today.diastolic}" oninput="today.diastolic=this.value" style="width:100%;font-size:13px;padding:7px 0;border:none;border-bottom:1.5px solid var(--border);background:transparent;color:var(--text);outline:none"></div></div>
+      </div>
+    </div>
+    <div class="card"><div class="lbl">🍽️ Eten</div><textarea placeholder="Protocol gevolgd?" oninput="today.food=this.value" style="width:100%;min-height:46px;resize:vertical;border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;line-height:1.5">${today.food}</textarea></div>
+    <div class="card"><div class="lbl">📝 Notities</div><textarea placeholder="Hoe was je dag?" oninput="today.notes=this.value" style="width:100%;min-height:40px;resize:vertical;border:none;background:transparent;color:var(--text);font-size:13px;font-family:inherit;outline:none;line-height:1.5">${today.notes}</textarea></div>
+    <button class="save-btn" id="save-btn" onclick="saveLog()"><i class="ti ti-device-floppy" style="font-size:14px;vertical-align:-2px;margin-right:6px"></i>Dag opslaan</button>`;
+}
+
+function renderTraining(){
+  const lv=fitnessLv(),plan=PLANS[lv],wk=week();
+  const lvIcons=['ti-seedling','ti-plant','ti-barbell','ti-flame','ti-crown'];
+  const sched=[
+    {dag:'Maandag',type:'E-bike',detail:'65km (2×32.5km heen+terug)',icon:'ti-bike',c:'var(--teal)',bg:'var(--teal-light)'},
+    {dag:'Dinsdag',type:'E-bike',detail:'65km (2×32.5km heen+terug)',icon:'ti-bike',c:'var(--teal)',bg:'var(--teal-light)'},
+    {dag:'Woensdag',type:'Rust',detail:'Herstel — wandeling optioneel',icon:'ti-moon',c:'var(--gray)',bg:'var(--gray-light)'},
+    {dag:'Donderdag',type:'E-bike',detail:'65km (2×32.5km heen+terug)',icon:'ti-bike',c:'var(--teal)',bg:'var(--teal-light)'},
+    {dag:'Vrijdag',type:'E-bike',detail:'65km (2×32.5km heen+terug)',icon:'ti-bike',c:'var(--teal)',bg:'var(--teal-light)'},
+    {dag:'Zaterdag',type:'Kracht + Koers',detail:plan.str,icon:'ti-barbell',c:'var(--coral)',bg:'var(--coral-light)'},
+    {dag:'Zondag',type:'Zwemmen',detail:plan.swim,icon:'ti-wave-sine',c:'var(--blue)',bg:'var(--blue-light)'},
+  ];
+  return `
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px">Trainingsplan</div>
+    <div class="card" style="border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div><div style="font-weight:600;font-size:15px;color:var(--teal-dark)">${plan.name}</div><div style="font-size:11px;color:var(--text3)">Level ${lv}/5 · Week ${wk}</div></div>
+        <i class="ti ${lvIcons[lv-1]}" style="font-size:26px;color:var(--teal)"></i>
+      </div>
+      ${pbar(lv,5,'var(--teal)')}
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">Intensiteit stijgt automatisch op basis van je logs</div>
+    </div>
+    <div class="lbl" style="margin-bottom:8px">Weekschema</div>
+    ${sched.map(s=>`
+      <div class="card" style="display:flex;gap:10px;align-items:flex-start">
+        <div style="width:34px;height:34px;border-radius:var(--radius-sm);background:${s.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <i class="ti ${s.icon}" style="font-size:17px;color:${s.c}"></i>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-size:13px;font-weight:500">${s.dag}</div>
+            <span class="pill" style="background:${s.bg};color:${s.c};font-size:10px">${s.type}</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);margin-top:3px">${s.detail}</div>
+        </div>
+      </div>`).join('')}
+    <div class="lbl" style="margin:14px 0 8px">Einddoelen</div>
+    ${[
+      {label:'Koersfiets',target:'120 km @ 30 km/u',c:'var(--teal)',note:'Bereikbaar in Level 5'},
+      {label:'Zwemmen',target:'40×25m schoolslag',c:'var(--blue)',note:'Bereikbaar in Level 5'},
+      {label:'Gewicht',target:'85 kg',c:'var(--coral)',note:'Geschat mid-2027'},
+    ].map(g=>`
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+          <div style="font-size:13px;font-weight:500">${g.label}</div>
+          <div style="font-size:11px;color:var(--text3)">${g.note}</div>
+        </div>
+        <div style="font-size:11px;color:var(--text2)">🎯 ${g.target}</div>
+      </div>`).join('')}`;
+}
+
+function renderHistory(){
+  const sorted=[...logs].reverse().slice(0,30);
+  return `
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px">Historiek (${logs.length} logs)</div>
+    ${!sorted.length?`<div class="card" style="text-align:center;padding:28px;color:var(--text3)"><i class="ti ti-clipboard" style="font-size:28px;display:block;margin-bottom:8px"></i>Nog geen data — start op 10 mei!</div>`:''}
+    ${sorted.map(l=>`
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+          <div style="font-size:13px;font-weight:500">${fmtDate(l.date)}</div>
+          <div style="display:flex;gap:4px">
+            ${l.weight?`<span class="pill" style="background:var(--teal-light);color:var(--teal-dark)">${l.weight}kg</span>`:''}
+            ${l.meds?`<span class="pill" style="background:var(--purple-light);color:var(--purple)"><i class="ti ti-pill" style="font-size:10px"></i></span>`:''}
+            ${l.cpap?`<span class="pill" style="background:var(--blue-light);color:var(--blue)"><i class="ti ti-zzz" style="font-size:10px"></i></span>`:''}
+          </div>
+        </div>
+        ${l.workout?`<div style="font-size:11px;color:var(--text2);margin-bottom:2px"><i class="ti ti-run" style="font-size:11px;margin-right:4px"></i>${l.workout}</div>`:''}
+        ${l.steps?`<div style="font-size:11px;color:var(--text2);margin-bottom:2px"><i class="ti ti-walk" style="font-size:11px;margin-right:4px"></i>${parseInt(l.steps).toLocaleString('nl-BE')} stappen</div>`:''}
+        ${l.sleep?`<div style="font-size:11px;color:var(--text2);margin-bottom:2px"><i class="ti ti-moon" style="font-size:11px;margin-right:4px"></i>${l.sleep}u slaap · ⚡ ${l.energy}/10</div>`:''}
+        ${(l.sugar||l.systolic)?`<div style="font-size:11px;color:var(--text2);">${l.sugar?`🩸 ${l.sugar} mmol/L`:''} ${l.systolic&&l.diastolic?`💓 ${l.systolic}/${l.diastolic} mmHg`:''}</div>`:''}
+        ${l.notes?`<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic">${l.notes}</div>`:''}
+      </div>`).join('')}`;
+}
+
+function renderMedical(){
+  const wl=logs.filter(l=>l.weight),lastW=wl.length?parseFloat(wl.slice(-1)[0].weight):null;
+  const pct=lastW!==null?Math.max(0,Math.round(((WS-lastW)/(WS-WG))*100)):null;
+  const lost=lastW!==null?(WS-lastW).toFixed(1):null;
+  const sl=logs.filter(l=>l.sugar&&l.sugar!=''),lastS=sl.length?parseFloat(sl.slice(-1)[0].sugar):null;
+  const bl=logs.filter(l=>l.systolic&&l.systolic!=''),lastBP=bl.length?bl.slice(-1)[0]:null;
+  const bpPct=lastBP?Math.max(0,Math.min(100,Math.round(((180-parseInt(lastBP.systolic))/(180-120))*100))):null;
+  const bpCol=lastBP?(parseInt(lastBP.systolic)<130?'var(--teal)':parseInt(lastBP.systolic)<140?'var(--amber)':'var(--red)'):null;
+  const ml=logs.filter(l=>l.meds!==undefined),mt=ml.length,mk=ml.filter(l=>l.meds).length;
+  const cl=logs.filter(l=>l.cpap!==undefined),ct=cl.length,cu=cl.filter(l=>l.cpap).length;
+  const days7=['Z','M','D','W','D','V','Z'];
+  function w7(key,color,colorBg){
+    return Array.from({length:7},(_,i)=>{
+      const d=new Date();d.setDate(d.getDate()-(6-i));
+      const ds=d.toISOString().split('T')[0];
+      const lg=logs.find(l=>l.date===ds);
+      const dow=d.getDay();
+      const has=lg&&lg[key];
+      return `<div class="day-chip" style="background:${has?colorBg:lg?'var(--red-light)':'var(--bg)'};color:${has?color:lg?'var(--red)':'var(--text3)'}">${days7[dow]}</div>`;
+    }).join('');
+  }
+  return `
+    <div style="font-size:15px;font-weight:600;margin-bottom:12px">Medisch overzicht</div>
+    <div class="card"><div class="lbl">💊 Medicatie — 7 dagen</div><div style="display:flex;gap:5px;margin-top:8px">${w7('meds','var(--teal-dark)','var(--teal-light)')}</div><div style="display:flex;gap:10px;margin-top:5px;font-size:10px"><span style="color:var(--teal)">■ Genomen</span><span style="color:var(--red)">■ Gemist</span><span style="color:var(--text3)">■ Niet gelogd</span></div></div>
+    <div class="card"><div class="lbl">😷 CPAP — 7 dagen</div><div style="display:flex;gap:5px;margin-top:8px">${w7('cpap','var(--blue)','var(--blue-light)')}</div></div>
+    <div class="lbl" style="margin:14px 0 8px">Gezondheidsmonitor</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:500">Gewicht</div><span style="font-size:12px;color:var(--teal)">${lastW?lastW+' kg':'—'}</span></div>${pct!==null?`${pbar(pct,100,'var(--teal)')}<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-top:3px"><span>Verloren: ${lost} kg</span><span>${pct}% → doel 85 kg</span></div>`:noData('Log je gewicht om voortgang te zien')}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:500">Bloedsuiker</div><span style="font-size:12px;color:var(--amber)">${lastS?lastS+' mmol/L':'—'}</span></div>${lastS!==null?`${pbar(Math.max(0,Math.min(100,Math.round(((12-lastS)/(12-4))*100))),100,'var(--amber)')}<div style="font-size:11px;color:var(--text3);margin-top:3px">🎯 Doel: &lt; 7.0 mmol/L · Metformax + Toujeo</div>`:noData('Log bloedsuiker via het Log tabblad')}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:500">Bloeddruk</div><span style="font-size:12px;color:${bpCol||'var(--text3)'};">${lastBP?lastBP.systolic+'/'+lastBP.diastolic+' mmHg':'—'}</span></div>${bpPct!==null?`${pbar(bpPct,100,bpCol)}<div style="font-size:11px;color:var(--text3);margin-top:3px">🎯 Doel: &lt; 130/80 mmHg · Coversyl</div>`:noData('Log bloeddruk via het Log tabblad')}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:500">Medicatie compliance</div><span style="font-size:12px;color:var(--purple)">${mt>0?mk+'/'+mt+' dagen':'—'}</span></div>${mt>0?`${pbar(Math.round((mk/mt)*100),100,'var(--purple)')}<div style="font-size:11px;color:var(--text3);margin-top:3px">Dovato · Metformax · Toujeo · Coversyl</div>`:noData('Vink medicatie aan bij het loggen')}</div>
+    <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:4px"><div style="font-size:13px;font-weight:500">CPAP gebruik</div><span style="font-size:12px;color:var(--blue)">${ct>0?cu+'/'+ct+' nachten':'—'}</span></div>${ct>0?`${pbar(Math.round((cu/ct)*100),100,'var(--blue)')}<div style="font-size:11px;color:var(--text3);margin-top:3px">Goede slaap = betere bloedsuikercontrole</div>`:noData('Vink CPAP aan bij het loggen')}</div>`;
+}
+
+function selWT(t){today.wtype=t;today.workout=t!=='rust'?t:'';rerender();}
+function selMood(n){today.mood=n;rerender();}
+
+async function saveLog(){
+  const btn=document.getElementById('save-btn');
+  if(btn){btn.textContent='Opslaan...';btn.disabled=true;}
+  const entry={...today,date:todayStr(),savedAt:new Date().toISOString()};
+  logs=[...logs.filter(l=>l.date!==todayStr()),entry];
+  try{localStorage.setItem(SK,JSON.stringify({logs,version:3}));}catch(_){}
+  toast('✓ Opgeslagen!');
+  setTimeout(()=>rerender(),800);
+}
+
+function showTab(t){
+  curTab=t;
+  ['home','log','training','history','medical'].forEach(id=>{
+    const b=document.getElementById('tb-'+id);
+    if(b)b.className='tab-btn'+(id===t?' active':'');
+  });
+  rerender();
+}
+
+function rerender(){
+  const c=document.getElementById('content');
+  if(!c)return;
+  const r={home:renderHome,log:renderLog,training:renderTraining,history:renderHistory,medical:renderMedical};
+  c.innerHTML=(r[curTab]||renderHome)();
+}
+
+function init(){
+  try{const s=localStorage.getItem(SK);if(s){const d=JSON.parse(s);logs=d.logs||[];const td=logs.find(l=>l.date===todayStr());if(td)today={...today,...td};}}catch(_){}
+  rerender();
+}
+init();
+</script>
+</body>
+</html>

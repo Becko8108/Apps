@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Becko — Income Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #0e0e0e;
+  --paper: #f5f2ec;
+  --surface: #ffffff;
+  --muted: #888;
+  --border: rgba(0,0,0,0.1);
+  --teal: #1a9e73;
+  --teal-bg: #e0f5ed;
+  --amber: #c47f00;
+  --amber-bg: #fef3d5;
+  --blue: #1a5fa5;
+  --blue-bg: #e5f0fb;
+  --red: #c0392b;
+  --red-bg: #fdecea;
+  --purple: #5940c0;
+  --purple-bg: #eeeafe;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding-bottom: 90px;
+}
+
+/* ── TOP BAR ── */
+.topbar {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 14px 18px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.brand { font-size: 15px; font-weight: 800; letter-spacing: -0.3px; }
+.brand span { color: var(--teal); }
+.topbar-right { text-align: right; }
+.topbar-right .val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--teal); }
+.topbar-right .sub { font-size: 10px; color: var(--muted); margin-top: 1px; }
+
+/* ── CONTENT ── */
+.content { max-width: 480px; margin: 0 auto; padding: 14px 16px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.card-dark {
+  background: var(--ink);
+  border-color: transparent;
+}
+.lbl {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.lbl-dark { color: #666; }
+
+/* ── PROGRESS BAR ── */
+.pbar { background: rgba(0,0,0,0.07); border-radius: 99px; height: 6px; overflow: hidden; margin: 6px 0; }
+.pbar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+
+/* ── TABS ── */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--ink);
+  display: flex;
+  padding: 8px 8px 14px;
+  gap: 4px;
+  z-index: 100;
+}
+.tab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #555;
+  font-family: 'Syne', sans-serif;
+  font-size: 9px;
+  font-weight: 500;
+  padding: 7px 2px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  transition: background .15s, color .15s;
+  letter-spacing: .3px;
+}
+.tab-btn svg { width: 18px; height: 18px; stroke-width: 1.8; }
+.tab-btn.active { background: var(--teal); color: #fff; }
+
+/* ── ROW ITEMS ── */
+.row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  gap: 8px;
+}
+.row-item:last-child { border-bottom: none; }
+.row-l { color: var(--muted); flex: 1; display: flex; align-items: center; gap: 8px; }
+.row-r { font-weight: 600; text-align: right; flex-shrink: 0; font-family: 'DM Mono', monospace; font-size: 12px; }
+
+/* ── INPUTS ── */
+.inp-group { margin-bottom: 14px; }
+.inp-group label { display: block; font-size: 10px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; font-weight: 500; }
+.inp-group input, .inp-group select, .inp-group textarea {
+  width: 100%;
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  padding: 9px 0;
+  border: none;
+  border-bottom: 1.5px solid var(--border);
+  background: transparent;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .2s;
+}
+.inp-group input:focus, .inp-group select:focus { border-color: var(--teal); }
+.inp-group textarea { resize: vertical; min-height: 50px; }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  letter-spacing: .3px;
+  transition: opacity .2s;
+  margin-top: 4px;
+}
+.btn-primary:active { opacity: .8; }
+.btn-primary.teal { background: var(--teal); }
+.btn-sm {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: var(--surface);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+/* ── PILL ── */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .3px;
+}
+
+/* ── GRID ── */
+.g2 { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 8px; margin-bottom: 10px; }
+.stat-card { background: var(--paper); border-radius: var(--radius-sm); padding: 12px; text-align: center; border: 1px solid var(--border); }
+.stat-val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; margin-bottom: 2px; }
+.stat-lbl { font-size: 10px; color: var(--muted); letter-spacing: .5px; }
+
+/* ── PLATFORM BADGE ── */
+.platform { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--paper); border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 6px; }
+.platform .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.platform .name { font-size: 13px; font-weight: 600; flex: 1; }
+.platform .status { font-size: 10px; color: var(--muted); }
+.platform .earn { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; }
+
+/* ── PIPELINE CARD ── */
+.deal-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 7px; }
+.deal-card .deal-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+.deal-card .deal-meta { font-size: 11px; color: var(--muted); }
+.stage-badge { display: inline-block; border-radius: 99px; padding: 2px 9px; font-size: 10px; font-weight: 600; }
+
+/* ── SCHEDULE ── */
+.sched-row { display: flex; gap: 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.sched-row:last-child { border-bottom: none; }
+.sched-day { width: 28px; height: 28px; border-radius: 6px; background: var(--paper); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; color: var(--muted); border: 1px solid var(--border); }
+.sched-day.active { background: var(--teal); color: #fff; border-color: var(--teal); }
+.sched-time { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); flex-shrink: 0; width: 90px; }
+
+/* ── TOAST ── */
+.toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: var(--ink); color: var(--paper); padding: 10px 20px; border-radius: 99px; font-size: 12px; font-weight: 600; z-index: 999; opacity: 0; transition: opacity .3s; pointer-events: none; white-space: nowrap; letter-spacing: .3px; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div>
+    <div class="brand">Becko <span>Income</span></div>
+    <div style="font-size:10px;color:#555;margin-top:1px" id="top-week">Week van 10 mei</div>
+  </div>
+  <div class="topbar-right">
+    <div class="val" id="top-total">€0</div>
+    <div class="sub">bijberoep ytd</div>
+  </div>
+</div>
+
+<div class="content" id="content"></div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tb-dash" onclick="show('dash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Dashboard
+  </button>
+  <button class="tab-btn" id="tb-log" onclick="show('log')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+    Log sessie
+  </button>
+  <button class="tab-btn" id="tb-pipe" onclick="show('pipe')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    Pipeline
+  </button>
+  <button class="tab-btn" id="tb-sched" onclick="show('sched')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Schema
+  </button>
+  <button class="tab-btn" id="tb-add" onclick="show('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+    Toevoegen
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const KEY = 'becko_income_v1';
+const GOAL_MONTH = 500;
+const GOAL_YEAR = 5000;
+const EUR_RATE = 145;
+
+const PLATFORMS = [
+  { id: 'outlier', name: 'Outlier.ai', color: '#1a9e73', url: 'https://outlier.ai', desc: 'AI training tasks' },
+  { id: 'scale', name: 'Scale AI / Remotasks', color: '#1a5fa5', url: 'https://remotasks.com', desc: 'Data labeling' },
+  { id: 'remo', name: 'RemoExperts', color: '#5940c0', url: 'https://remoexperts.com', desc: 'Expert AI tasks' },
+  { id: 'dataann', name: 'DataAnnotation', color: '#c0392b', url: 'https://www.dataannotation.tech', desc: 'AI data annotation' },
+  { id: 'freelance', name: 'Freelance', color: '#c47f00', desc: 'Klanten projecten' },
+  { id: 'other', name: 'Andere', color: '#888', desc: '' },
+];
+
+const SERVICES = ['AI workflow automatisatie (n8n/Claude)', 'Power BI dashboard', 'App development zelfstandigen', 'Data annotation', 'Andere'];
+const STAGES = ['Lead', 'Contact', 'Offerte', 'Onderhandeling', 'Gewonnen', 'Verloren'];
+const STAGE_COLORS = { Lead:'#888', Contact:'#1a5fa5', Offerte:'#c47f00', Onderhandeling:'#5940c0', Gewonnen:'#1a9e73', Verloren:'#c0392b' };
+
+let D = { sessions: [], deals: [], registered: {} };
+let curTab = 'dash';
+
+function load() {
+  try { const s = localStorage.getItem(KEY); if (s) D = { ...D, ...JSON.parse(s) }; } catch(_) {}
+}
+function save() {
+  try { localStorage.setItem(KEY, JSON.stringify(D)); toast('✓ Opgeslagen in browser'); } catch(_) { toast('⚠ Opslaan mislukt'); }
+}
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+const eur = n => '€' + Math.round(n).toLocaleString('nl-BE');
+const mono = s => `<span style="font-family:'DM Mono',monospace">${s}</span>`;
+
+function ytdTotal() { return D.sessions.reduce((a, s) => a + (s.eur || 0), 0); }
+function monthTotal() {
+  const m = new Date().getMonth(), y = new Date().getFullYear();
+  return D.sessions.filter(s => { const d = new Date(s.date); return d.getMonth()===m && d.getFullYear()===y; }).reduce((a,s) => a+(s.eur||0), 0);
+}
+function weekTotal() {
+  const now = new Date(), day = now.getDay(), mon = new Date(now); mon.setDate(now.getDate() - (day===0?6:day-1)); mon.setHours(0,0,0,0);
+  return D.sessions.filter(s => new Date(s.date) >= mon).reduce((a,s) => a+(s.eur||0), 0);
+}
+function platformTotal(id) { return D.sessions.filter(s => s.platform === id).reduce((a,s) => a+(s.eur||0), 0); }
+function totalHours() { return D.sessions.reduce((a,s) => a+(s.hours||0), 0); }
+function pipelineValue() { return D.deals.filter(d => !['Gewonnen','Verloren'].includes(d.stage)).reduce((a,d) => a+(d.value||0), 0); }
+
+// ── DASHBOARD ────────────────────────────────────────────────────────────────
+function renderDash() {
+  const ytd = ytdTotal(), month = monthTotal(), week = weekTotal(), hrs = totalHours();
+  const pipeVal = pipelineValue();
+  const wonDeals = D.deals.filter(d => d.stage === 'Gewonnen').reduce((a,d) => a+(d.value||0), 0);
+  const monthPct = Math.min(100, Math.round((month/GOAL_MONTH)*100));
+  const yearPct = Math.min(100, Math.round((ytd/GOAL_YEAR)*100));
+  const hourlyRate = hrs > 0 ? (ytd/hrs).toFixed(1) : '—';
+
+  document.getElementById('top-total').textContent = eur(ytd);
+  document.getElementById('top-week').textContent = `Bijberoep — ${new Date().toLocaleDateString('nl-BE',{month:'long',year:'numeric'})}`;
+
+  return `
+    <!-- Hero card -->
+    <div class="card card-dark" style="margin-bottom:10px">
+      <div class="lbl lbl-dark">Maandelijks doel — ${eur(GOAL_MONTH)}</div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+        <div style="font-size:30px;font-weight:800;color:${month>0?'#1a9e73':'#fff'};font-family:'DM Mono',monospace">${eur(month)}</div>
+        <div style="font-size:12px;color:#666">${monthPct}%</div>
+      </div>
+      <div class="pbar"><div class="pbar-fill" style="width:${monthPct}%;background:#1a9e73"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:#555;margin-top:5px">
+        <span>Deze week: ${eur(week)}</span>
+        <span>${eur(GOAL_MONTH - month)} nog nodig</span>
+      </div>
+    </div>
+
+    <!-- Stats grid -->
+    <div class="g2">
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--teal)">${eur(ytd)}</div>
+        <div class="stat-lbl">Totaal 2026</div>
+        <div style="margin-top:6px"><div class="pbar"><div class="pbar-fill" style="width:${yearPct}%;background:var(--teal)"></div></div></div>
+        <div style="font-size:10px;color:var(--muted);margin-top:3px">${yearPct}% van ${eur(GOAL_YEAR)} buffer</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--amber)">${eur(pipeVal)}</div>
+        <div class="stat-lbl">Pipeline waarde</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px">${D.deals.filter(d=>!['Gewonnen','Verloren'].includes(d.stage)).length} actieve deals</div>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="stat-card">
+        <div class="stat-val">${hrs}u</div>
+        <div class="stat-lbl">Gewerkte uren</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px">${eur(hourlyRate)}/uur gem.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" style="color:var(--teal)">${eur(wonDeals)}</div>
+        <div class="stat-lbl">Gewonnen deals</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:8px">${D.deals.filter(d=>d.stage==='Gewonnen').length} projecten</div>
+      </div>
+    </div>
+
+    <!-- Platforms -->
+    <div class="card">
+      <div class="lbl">Platforms — inkomsten</div>
+      ${PLATFORMS.map(p => {
+        const tot = platformTotal(p.id);
+        const sessions = D.sessions.filter(s => s.platform === p.id).length;
+        const reg = D.registered?.[p.id];
+        return `
+        <div class="platform">
+          <div class="dot" style="background:${p.color}"></div>
+          <div style="flex:1">
+            <div class="name">${p.name}</div>
+            <div class="status">${reg ? '✓ Aangemeld' : '○ Nog niet aangemeld'} · ${sessions} sessies</div>
+          </div>
+          <div class="earn" style="color:${tot>0?p.color:'var(--muted)'}">${eur(tot)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Recent sessions -->
+    <div class="card">
+      <div class="lbl">Recente sessies</div>
+      ${D.sessions.length === 0 ? `<div style="text-align:center;padding:20px;color:var(--muted);font-size:12px">Nog geen sessies — log je eerste bijberoep uur!</div>` : ''}
+      ${[...D.sessions].reverse().slice(0,5).map(s => {
+        const p = PLATFORMS.find(p => p.id === s.platform) || PLATFORMS[4];
+        return `
+        <div class="row-item">
+          <div class="row-l">
+            <div class="dot" style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0"></div>
+            <div>
+              <div style="font-size:12px;font-weight:500">${p.name}</div>
+              <div style="font-size:10px;color:var(--muted)">${new Date(s.date).toLocaleDateString('nl-BE',{day:'numeric',month:'short'})} · ${s.hours}u${s.notes?' · '+s.notes:''}</div>
+            </div>
+          </div>
+          <div class="row-r" style="color:var(--teal)">+${eur(s.eur)}</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <!-- Registration checklist -->
+    <div class="card">
+      <div class="lbl">Aanmeldstatus platforms</div>
+      ${PLATFORMS.slice(0,5).map(p => {
+        const reg = D.registered?.[p.id];
+        return `
+        <div class="row-item">
+          <div class="row-l">
+            <div style="width:20px;height:20px;border-radius:50%;background:${reg?p.color+'22':'var(--paper)'};border:1.5px solid ${reg?p.color:'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:10px;color:${p.color};flex-shrink:0">${reg?'✓':''}</div>
+            ${p.name}
+          </div>
+          <button class="btn-sm" onclick="toggleReg('${p.id}')">${reg ? 'Aangemeld ✓' : 'Markeer aangemeld'}</button>
+        </div>`;
+      }).join('')}
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
+        Aanmelden: <a href="https://outlier.ai" target="_blank" style="color:var(--teal)">outlier.ai</a> · 
+        <a href="https://remotasks.com" target="_blank" style="color:var(--blue)">remotasks.com</a> · 
+        <a href="https://remoexperts.com" target="_blank" style="color:var(--purple)">remoexperts.com</a> ·
+        <a href="https://www.dataannotation.tech" target="_blank" style="color:var(--red)">dataannotation.tech</a>
+      </div>
+    </div>
+  `;
+}
+
+function toggleReg(id) {
+  if (!D.registered) D.registered = {};
+  D.registered[id] = !D.registered[id];
+  save(); rerender();
+}
+
+// ── LOG SESSIE ───────────────────────────────────────────────────────────────
+function renderLog() {
+  return `
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;letter-spacing:-.3px">Sessie loggen</div>
+
+    <div class="card">
+      <div class="inp-group">
+        <label>Platform</label>
+        <select id="l-plat">
+          ${PLATFORMS.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+        </select>
+      </div>
+      <div class="inp-group">
+        <label>Datum</label>
+        <input type="date" id="l-date" value="${new Date().toISOString().split('T')[0]}">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="inp-group">
+          <label>Uren gewerkt</label>
+          <input type="number" id="l-hours" step="0.5" min="0.5" max="8" placeholder="1.5">
+        </div>
+        <div class="inp-group">
+          <label>Verdienst (€)</label>
+          <input type="number" id="l-eur" step="0.01" min="0" placeholder="12.50">
+        </div>
+      </div>
+      <div class="inp-group">
+        <label>Type taken</label>
+        <input type="text" id="l-notes" placeholder="bv. code review, NL prompt schrijven...">
+      </div>
+      <div class="inp-group">
+        <label>Energie/kwaliteit (1-5)</label>
+        <input type="range" id="l-qual" min="1" max="5" value="3" oninput="document.getElementById('l-qual-val').textContent=this.value+'⭐'">
+        <span id="l-qual-val" style="font-size:12px;color:var(--muted)">3⭐</span>
+      </div>
+      <button class="btn-primary teal" onclick="saveSession()">Sessie opslaan</button>
+    </div>
+
+    ${D.sessions.length > 0 ? `
+    <div class="card">
+      <div class="lbl">Alle sessies (${D.sessions.length})</div>
+      ${[...D.sessions].reverse().map((s,i) => {
+        const p = PLATFORMS.find(p => p.id === s.platform) || PLATFORMS[4];
+        const idx = D.sessions.length - 1 - i;
+        return `
+        <div class="row-item">
+          <div class="row-l">
+            <div class="dot" style="width:8px;height:8px;border-radius:50%;background:${p.color};flex-shrink:0"></div>
+            <div>
+              <div style="font-size:12px;font-weight:500">${p.name}</div>
+              <div style="font-size:10px;color:var(--muted)">${new Date(s.date).toLocaleDateString('nl-BE',{day:'numeric',month:'short'})} · ${s.hours}u${s.notes?' · '+s.notes:''}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="row-r" style="color:var(--teal)">+${eur(s.eur)}</div>
+            <button class="btn-sm" style="padding:4px 8px;font-size:10px;color:var(--red);border-color:var(--red)" onclick="deleteSession(${idx})">✕</button>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>` : ''}
+  `;
+}
+
+function saveSession() {
+  const plat = document.getElementById('l-plat')?.value;
+  const date = document.getElementById('l-date')?.value;
+  const hours = parseFloat(document.getElementById('l-hours')?.value);
+  const eur_val = parseFloat(document.getElementById('l-eur')?.value);
+  const notes = document.getElementById('l-notes')?.value || '';
+  const qual = parseInt(document.getElementById('l-qual')?.value) || 3;
+  if (!plat || !date || isNaN(hours) || isNaN(eur_val)) { toast('Vul alle velden in!'); return; }
+  D.sessions.push({ platform: plat, date, hours, eur: eur_val, notes, qual, savedAt: new Date().toISOString() });
+  save(); show('dash');
+}
+
+function deleteSession(idx) {
+  if (!confirm('Sessie verwijderen?')) return;
+  D.sessions.splice(idx, 1);
+  save(); rerender();
+}
+
+// ── PIPELINE ──────────────────────────────────────────────────────────────────
+function renderPipe() {
+  const active = D.deals.filter(d => !['Gewonnen','Verloren'].includes(d.stage));
+  const closed = D.deals.filter(d => ['Gewonnen','Verloren'].includes(d.stage));
+
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:800;letter-spacing:-.3px">Freelance pipeline</div>
+      <button class="btn-sm" onclick="show('add')">+ Deal</button>
+    </div>
+
+    ${active.length === 0 ? `
+    <div class="card" style="text-align:center;padding:30px">
+      <div style="font-size:28px;margin-bottom:8px">🎯</div>
+      <div style="font-size:13px;color:var(--muted)">Nog geen actieve deals.<br>Voeg je eerste KMO-prospect toe!</div>
+    </div>` : ''}
+
+    ${active.length > 0 ? `
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600">Actief (${active.length})</div>
+    ${active.map((d, i) => dealCard(d, D.deals.indexOf(d))).join('')}` : ''}
+
+    ${closed.length > 0 ? `
+    <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin:14px 0 8px;font-weight:600">Afgesloten</div>
+    ${closed.map(d => dealCard(d, D.deals.indexOf(d))).join('')}` : ''}
+
+    <!-- Services aanbod -->
+    <div class="card" style="margin-top:4px">
+      <div class="lbl">Mijn aanbod — KMO's</div>
+      ${[
+        {name:'AI workflow automatisatie', desc:'n8n + Claude integraties voor bedrijven', price:'€800–2.500/project', color:'var(--teal)'},
+        {name:'Power BI dashboard', desc:'Rapportage & data visualisatie', price:'€500–1.500/project', color:'var(--blue)'},
+        {name:'App development', desc:'Minder admin, professionelere uitstraling', price:'€500–2.000/project', color:'var(--amber)'},
+      ].map(s => `
+        <div class="row-item">
+          <div class="row-l">
+            <div style="width:6px;height:6px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
+            <div>
+              <div style="font-size:12px;font-weight:600">${s.name}</div>
+              <div style="font-size:10px;color:var(--muted)">${s.desc}</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:${s.color};font-weight:600;text-align:right;flex-shrink:0">${s.price}</div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function dealCard(d, idx) {
+  const c = STAGE_COLORS[d.stage] || '#888';
+  return `
+  <div class="deal-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+      <div>
+        <div class="deal-name">${d.name}</div>
+        <div class="deal-meta">${d.service} · ${d.company || 'Prospect'}</div>
+      </div>
+      <span class="stage-badge" style="background:${c}22;color:${c}">${d.stage}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <div style="font-family:'DM Mono',monospace;font-size:14px;font-weight:500;color:${c}">${eur(d.value || 0)}</div>
+      <div style="display:flex;gap:6px">
+        ${STAGES.filter(s => s !== d.stage).slice(0,2).map(s =>
+          `<button class="btn-sm" style="font-size:10px" onclick="advanceDeal(${idx},'${s}')">${s}</button>`
+        ).join('')}
+        <button class="btn-sm" style="font-size:10px;color:var(--red);border-color:var(--red)" onclick="deleteDeal(${idx})">✕</button>
+      </div>
+    </div>
+    ${d.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:6px;font-style:italic">${d.notes}</div>` : ''}
+  </div>`;
+}
+
+function advanceDeal(idx, stage) {
+  D.deals[idx].stage = stage;
+  save(); rerender();
+}
+function deleteDeal(idx) {
+  if (!confirm('Deal verwijderen?')) return;
+  D.deals.splice(idx, 1);
+  save(); rerender();
+}
+
+// ── SCHEMA ────────────────────────────────────────────────────────────────────
+function renderSched() {
+  const schedule = [
+    { dag: 'Ma', label: 'Maandag', active: true, time: '20:00–21:00', activity: '1u bijberoep — data annotation of freelance' },
+    { dag: 'Di', label: 'Dinsdag', active: true, time: '20:00–21:00', activity: '1u bijberoep — data annotation of freelance' },
+    { dag: 'Wo', label: 'Woensdag', active: true, time: '20:00–21:00', activity: '1u bijberoep — rustdag van e-bike, extra energie' },
+    { dag: 'Do', label: 'Donderdag', active: true, time: '20:00–21:00', activity: '1u bijberoep — data annotation of freelance' },
+    { dag: 'Vr', label: 'Vrijdag', active: true, time: '20:00–21:00', activity: '1u bijberoep — week afsluiten' },
+    { dag: 'Za', label: 'Zaterdag', active: true, time: '17:00–20:00', activity: '3u bijberoep — langere sessie, freelance werk' },
+    { dag: 'Zo', label: 'Zondag', active: true, time: '17:00–19:00', activity: '2u bijberoep — week afronden' },
+  ];
+
+  const weekHours = 10; // ma-vr 5×1u + za 3u + zo 2u
+  const monthHours = weekHours * 4.3;
+  const rateMin = 8, rateMax = 20;
+
+  return `
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;letter-spacing:-.3px">Weekschema bijberoep</div>
+
+    <div class="card card-dark" style="margin-bottom:10px">
+      <div class="lbl lbl-dark">Beschikbare uren / week</div>
+      <div style="font-size:32px;font-weight:800;color:var(--teal);font-family:'DM Mono',monospace">10u</div>
+      <div style="font-size:12px;color:#666;margin-top:4px">Ma–Vr 20-21u (5u) + Za 17-20u (3u) + Zo 17-19u (2u)</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+          <div style="font-size:10px;color:#555;margin-bottom:3px">Per maand</div>
+          <div style="font-family:'DM Mono',monospace;font-size:14px;color:#eee">~${Math.round(monthHours)}u</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.05);border-radius:8px;padding:10px">
+          <div style="font-size:10px;color:#555;margin-bottom:3px">Potentieel/mnd</div>
+          <div style="font-family:'DM Mono',monospace;font-size:14px;color:var(--teal)">${eur(monthHours*rateMin)}–${eur(monthHours*rateMax)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="lbl">Dagschema</div>
+      ${schedule.map(d => `
+        <div class="sched-row">
+          <div class="sched-day ${d.active ? 'active' : ''}">${d.dag}</div>
+          <div class="sched-time">${d.time}</div>
+          <div style="font-size:11px;color:${d.active ? 'var(--ink)' : 'var(--muted)'};">${d.activity}</div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="card">
+      <div class="lbl">Tijdsblokken gebruik</div>
+      ${[
+        { label: 'Ma–Vr 20-21u — DAGELIJKS', desc: 'Data annotation taken (alle platforms)', color: 'var(--teal)', hrs: '5u/week' },
+        { label: 'Za 17-20u — WEEKEND', desc: 'Langere sessie: freelance werk of annotation', color: 'var(--blue)', hrs: '3u/week' },
+        { label: 'Zo 17-19u — WEEKEND', desc: 'Freelance werk of annotation afronden', color: 'var(--purple)', hrs: '2u/week' },
+      ].map(b => `
+        <div class="row-item">
+          <div class="row-l">
+            <div style="width:6px;height:6px;border-radius:50%;background:${b.color};flex-shrink:0"></div>
+            <div>
+              <div style="font-size:12px;font-weight:500">${b.label}</div>
+              <div style="font-size:10px;color:var(--muted)">${b.desc}</div>
+            </div>
+          </div>
+          <div style="font-family:'DM Mono',monospace;font-size:12px;font-weight:600;color:${b.color}">${b.hrs}</div>
+        </div>`).join('')}
+    </div>
+
+    <div class="card" style="background:var(--teal-bg);border-color:var(--teal)">
+      <div class="lbl" style="color:var(--teal)">Realistische verwachting — 10u/week</div>
+      <div style="font-size:12px;color:#1a5a40;line-height:1.7">
+        <div>🟢 Maand 1–2: ${eur(monthHours*rateMin)}–${eur(monthHours*12)}/mnd (leerperiode)</div>
+        <div>🟡 Maand 3–4: ${eur(monthHours*12)}–${eur(monthHours*16)}/mnd (routine)</div>
+        <div>🔵 Maand 5+: ${eur(monthHours*16)}–${eur(monthHours*rateMax)}/mnd (ervaring)</div>
+        <div style="margin-top:6px;padding-top:6px;border-top:1px solid rgba(26,158,115,0.2)">Plus freelance projecten bovenop — potentieel €500–2.500 per project</div>
+      </div>
+    </div>
+
+    <div class="card" style="border-color:var(--muted)">
+      <div class="lbl">Data opslag</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.7">
+        <div>✓ Alle sessies en deals worden opgeslagen in je browser (localStorage)</div>
+        <div>✓ Data blijft bewaard als je de app sluit of de pagina herlaadt</div>
+        <div>⚠ Wis je browsergeschiedenis niet — dan verdwijnt de data ook</div>
+        <div style="margin-top:6px">💡 Zet de app als snelkoppeling op je homescreen voor dagelijks gebruik</div>
+      </div>
+    </div>
+  `;
+}
+
+// ── TOEVOEGEN ─────────────────────────────────────────────────────────────────
+function renderAdd() {
+  return `
+    <div style="font-size:16px;font-weight:800;margin-bottom:14px;letter-spacing:-.3px">Nieuwe deal toevoegen</div>
+
+    <div class="card">
+      <div class="inp-group">
+        <label>Bedrijfsnaam / klant</label>
+        <input type="text" id="d-name" placeholder="bv. Bakkerij Janssen BVBA">
+      </div>
+      <div class="inp-group">
+        <label>Contactpersoon</label>
+        <input type="text" id="d-company" placeholder="Naam contactpersoon">
+      </div>
+      <div class="inp-group">
+        <label>Service</label>
+        <select id="d-service">
+          ${SERVICES.map(s => `<option>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="inp-group">
+        <label>Geschatte waarde (€)</label>
+        <input type="number" id="d-value" placeholder="1200" min="0">
+      </div>
+      <div class="inp-group">
+        <label>Stadium</label>
+        <select id="d-stage">
+          ${STAGES.slice(0,4).map(s => `<option>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="inp-group">
+        <label>Notities</label>
+        <textarea id="d-notes" placeholder="Context, volgende stap, contactmethode..."></textarea>
+      </div>
+      <button class="btn-primary" onclick="saveDeal()">Deal opslaan</button>
+    </div>
+
+    <!-- KMO tips -->
+    <div class="card">
+      <div class="lbl">Hoe eerste klanten vinden (Pelt / Limburg)</div>
+      ${[
+        { tip: 'Netwerk Gencom', desc: 'Klanten die jij al kent via support — directe in' },
+        { tip: 'LinkedIn Limburg', desc: 'Zaakvoerders KMO\'s zoeken naar "AI automatisatie"' },
+        { tip: 'Lokale ondernemersclub', desc: 'UNIZO Pelt / Neerpelt — presentatie aanbieden' },
+        { tip: 'Gratis audit aanbieden', desc: '30 min gratis analyse → betalende opdracht' },
+        { tip: 'Referral vragen', desc: 'Elke tevreden klant → 2 namen vragen' },
+      ].map(t => `
+        <div class="row-item">
+          <div class="row-l">
+            <div style="width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0"></div>
+            <div>
+              <div style="font-size:12px;font-weight:600">${t.tip}</div>
+              <div style="font-size:10px;color:var(--muted)">${t.desc}</div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function saveDeal() {
+  const name = document.getElementById('d-name')?.value?.trim();
+  const company = document.getElementById('d-company')?.value?.trim();
+  const service = document.getElementById('d-service')?.value;
+  const value = parseFloat(document.getElementById('d-value')?.value) || 0;
+  const stage = document.getElementById('d-stage')?.value;
+  const notes = document.getElementById('d-notes')?.value?.trim();
+  if (!name) { toast('Vul de bedrijfsnaam in!'); return; }
+  D.deals.push({ name, company, service, value, stage, notes, createdAt: new Date().toISOString() });
+  save(); show('pipe');
+}
+
+// ── ROUTING ───────────────────────────────────────────────────────────────────
+function show(tab) {
+  curTab = tab;
+  ['dash','log','pipe','sched','add'].forEach(t => {
+    const b = document.getElementById('tb-' + t);
+    if (b) b.className = 'tab-btn' + (t === tab ? ' active' : '');
+  });
+  rerender();
+}
+
+function rerender() {
+  const renders = { dash: renderDash, log: renderLog, pipe: renderPipe, sched: renderSched, add: renderAdd };
+  document.getElementById('content').innerHTML = (renders[curTab] || renderDash)();
+}
+
+load();
+rerender();
+</script>
+</body>
+</html>
